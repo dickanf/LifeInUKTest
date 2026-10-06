@@ -11,7 +11,7 @@
   <meta http-equiv="Expires"       content="0" />
 
   <!-- ── BUMP VERSION to match index.html on every deploy ── -->
-  <script src="data.js?v=20261006.9"></script>
+  <script src="data.js?v=20261006.10"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -320,7 +320,7 @@
       <span class="tog-track"></span>
       <span class="tog-label">Unique View</span>
     </label>
-    <span class="desc" id="unique-desc">Each topic shown in one section only — regional items hidden from Timeline</span>
+    <span class="desc" id="unique-desc">Each topic shown in one section only — regional items hidden from Timeline<span class="zh">每個主題只在一個部分顯示 — 地區項目已從時間軸隱藏</span></span>
   </div>
   <div class="lang-btns">
     <button class="lang-btn" id="btn-en"   onclick="setLang('en')">English</button>
@@ -410,9 +410,9 @@ function isUniqueOn() { return document.getElementById('unique-toggle').checked;
 
 function applyUniqueView() {
   const unique = isUniqueOn();
-  document.getElementById('unique-desc').textContent = unique
-    ? 'Each topic shown in one section only — regional items hidden from Timeline'
-    : 'All items visible in both sections — yellow badge marks cross-section items';
+  document.getElementById('unique-desc').innerHTML = unique
+    ? 'Each topic shown in one section only — regional items hidden from Timeline<span class="zh">每個主題只在一個部分顯示 — 地區項目已從時間軸隱藏</span>'
+    : 'All items visible in both sections — yellow badge marks cross-section items<span class="zh">所有項目在兩個部分均可見 — 黃色標籤標示重複項目</span>';
   filterTimeline();
   updateRegionBadges();
 }

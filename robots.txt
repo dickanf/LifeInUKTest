@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dickanf.github.io/LifeInUKTest/sitemap.xml

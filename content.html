@@ -11,7 +11,7 @@
   <meta http-equiv="Expires"       content="0" />
 
   <!-- ── BUMP VERSION to match index.html on every deploy ── -->
-  <script src="data.js?v=20261006.15"></script>
+  <script src="data.js?v=20261006.16"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -355,19 +355,19 @@
               <span class="zh">問題／主題</span>
             </th>
             <th class="col-eng">
-              <span class="en">&#127988; England</span>
+              <span class="en">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</span>
               <span class="zh">英格蘭</span>
             </th>
             <th class="col-sco">
-              <span class="en">&#127988; Scotland</span>
+              <span class="en">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</span>
               <span class="zh">蘇格蘭</span>
             </th>
             <th class="col-wal">
-              <span class="en">&#127988; Wales</span>
+              <span class="en">🏴󠁧󠁢󠁷󠁬󠁳󠁿 Wales</span>
               <span class="zh">威爾斯</span>
             </th>
             <th class="col-ni">
-              <span class="en">&#127988; Northern Ireland</span>
+              <span class="en">🇬🇧 Northern Ireland</span>
               <span class="zh">北愛爾蘭</span>
             </th>
             <th style="min-width:90px">Exams</th>
@@ -539,7 +539,7 @@ function renderGlobalResults(q) {
   if (regionMatches.length) {
     const h = document.createElement('div');
     h.className = 'gr-section-title';
-    h.textContent = `🏴 UK Four Regions — ${regionMatches.length} match${regionMatches.length > 1 ? 'es' : ''}`;
+    h.textContent = `🇬🇧 UK Four Regions — ${regionMatches.length} match${regionMatches.length > 1 ? 'es' : ''}`;
     panel.appendChild(h);
 
     regionMatches.forEach(({ row, idx }) => {
@@ -564,7 +564,7 @@ function renderGlobalResults(q) {
 
       const tags = (row.exams || []).map(e => `<span class="exam-tag">${e}</span>`).join('');
       div.innerHTML = `
-        <div><span class="gr-source gr-source-regions">&#127468;&#127463; UK Regions</span></div>
+        <div><span class="gr-source gr-source-regions">🇬🇧 UK Regions</span></div>
         <div class="gr-question">
           <span class="en">${row.question}</span>
           <span class="zh">${row.question_zh || ''}</span>

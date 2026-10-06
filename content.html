@@ -11,7 +11,7 @@
   <meta http-equiv="Expires"       content="0" />
 
   <!-- ── BUMP VERSION to match index.html on every deploy ── -->
-  <script src="data.js?v=20261006.4"></script>
+  <script src="data.js?v=20261006.5"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,9 +29,23 @@
       --text:     #1a1d2e;
       --muted:    #6b7280;
       --radius:   8px;
+      --zh-color: #1a5f9e;
     }
 
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── BILINGUAL SPANS ── */
+    .zh { display: block; color: var(--zh-color); font-size: .88em; margin-top: 2px; }
+
+    /* English-only mode: hide Chinese */
+    body[data-lang="en"] .zh { display: none !important; }
+    /* Chinese-only mode: hide English */
+    body[data-lang="zh"] .en { display: none !important; }
+    /* "both" mode: show both (default, no extra rule needed) */
+
+    /* In "zh-only" mode, make empty cells still readable */
+    body[data-lang="zh"] .en.q-col-en,
+    body[data-lang="zh"] td.ans .en { display: none !important; }
 
     /* ── HEADER ── */
     header { background: var(--uk-blue); color: #fff; padding: 18px 24px 0; }
@@ -113,6 +127,9 @@
       color: var(--uk-blue);
       border-top: 2px solid var(--border);
     }
+    table.regions tr.cat-row td .zh {
+      font-size: .85em; letter-spacing: 0; text-transform: none;
+    }
 
     /* data rows */
     table.regions tbody tr td {
@@ -164,9 +181,12 @@
     .era-btn {
       padding: 5px 13px; border-radius: 20px; border: 1px solid var(--border);
       background: var(--card); font-size: .8rem; font-weight: 600;
-      cursor: pointer; transition: .15s;
+      cursor: pointer; transition: .15s; line-height: 1.4;
+      text-align: center;
     }
+    .era-btn .zh { margin-top: 0; font-size: .75em; }
     .era-btn:hover, .era-btn.active { background: var(--uk-blue); color: #fff; border-color: var(--uk-blue); }
+    .era-btn:hover .zh, .era-btn.active .zh { color: rgba(255,255,255,.75); }
 
     .timeline { position: relative; }
     .timeline::before { content:''; position:absolute; left:108px; top:0; bottom:0; width:2px; background:var(--border); }
@@ -176,6 +196,7 @@
       margin: 26px 0 10px; font-weight: 700; font-size: .75rem;
       text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
     }
+    .era-label .zh { letter-spacing: 0; text-transform: none; font-size: .85em; }
     .era-label::before {
       content:''; position:absolute; left:102px; top:50%;
       width:14px; height:14px; background:var(--uk-blue);
@@ -201,13 +222,15 @@
 
     .hidden-tl { display: none; }
 
-    /* ── UNIQUE VIEW TOGGLE BAR ── */
+    /* ── CONTROL BAR (unique view + language toggle) ── */
     .unique-bar {
-      display: flex; align-items: center; gap: 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
       background: #fff; border-bottom: 1px solid var(--border);
       padding: 8px 20px; font-size: .82rem;
     }
-    .unique-bar span { color: var(--muted); }
+    .unique-bar-left { display: flex; align-items: center; gap: 12px; }
+    .unique-bar span.desc { color: var(--muted); }
 
     /* toggle switch */
     .tog-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
@@ -232,6 +255,17 @@
       border: 1px solid #ffc107; border-radius: 4px;
       padding: 2px 7px; margin-top: 5px; font-weight: 600;
     }
+    .region-badge .zh { display: inline; font-size: 1em; margin-top: 0; color: #856404; }
+
+    /* ── LANGUAGE TOGGLE BUTTONS ── */
+    .lang-btns { display: flex; gap: 4px; }
+    .lang-btn {
+      padding: 4px 11px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--bg); font-size: .78rem; font-weight: 600;
+      cursor: pointer; color: var(--muted); transition: .15s;
+    }
+    .lang-btn:hover { border-color: var(--uk-blue); color: var(--uk-blue); }
+    .lang-btn.active { background: var(--uk-blue); color: #fff; border-color: var(--uk-blue); }
 
     footer {
       text-align:center; padding:20px; font-size:.75rem;
@@ -241,11 +275,11 @@
     .ver { opacity:.5; }
   </style>
 </head>
-<body>
+<body data-lang="both">
 
 <header>
   <h1>&#127468;&#127463; Life in the UK Test — Study Guide</h1>
-  <p>All questions &amp; answers from Exams 1–17 &nbsp;·&nbsp; UK Four Regions &amp; Historical Timeline</p>
+  <p>All questions &amp; answers from Exams 1–17 &nbsp;·&nbsp; UK Four Regions &amp; Historical Timeline &nbsp;·&nbsp; 英國入籍試備考指南</p>
   <div class="stripe"></div>
 </header>
 
@@ -254,14 +288,21 @@
   <button class="tab-btn"        onclick="switchTab('timeline',this)">&#128336; Historical Timeline</button>
 </div>
 
-<!-- ── UNIQUE VIEW TOGGLE ── -->
+<!-- ── CONTROL BAR: Unique View toggle + Language switcher ── -->
 <div class="unique-bar">
-  <label class="tog-wrap" title="When ON: items already shown in UK Regions tab are hidden from the Timeline tab">
-    <input type="checkbox" id="unique-toggle" checked onchange="applyUniqueView()" />
-    <span class="tog-track"></span>
-    <span class="tog-label">Unique View</span>
-  </label>
-  <span id="unique-desc">Each topic shown in one section only — regional items hidden from Timeline</span>
+  <div class="unique-bar-left">
+    <label class="tog-wrap" title="When ON: items already shown in UK Regions tab are hidden from the Timeline tab">
+      <input type="checkbox" id="unique-toggle" checked onchange="applyUniqueView()" />
+      <span class="tog-track"></span>
+      <span class="tog-label">Unique View</span>
+    </label>
+    <span class="desc" id="unique-desc">Each topic shown in one section only — regional items hidden from Timeline</span>
+  </div>
+  <div class="lang-btns">
+    <button class="lang-btn" id="btn-en"   onclick="setLang('en')">English</button>
+    <button class="lang-btn" id="btn-zh"   onclick="setLang('zh')">中文</button>
+    <button class="lang-btn active" id="btn-both" onclick="setLang('both')">中英 Both</button>
+  </div>
 </div>
 
 <main>
@@ -269,7 +310,7 @@
   <!-- ═══════════════════════ TAB 1 — REGIONS ═══════════════════════ -->
   <div id="tab-regions" class="tab-panel active">
     <div class="toolbar">
-      <input type="text" id="r-search" placeholder="Search questions or answers…" oninput="filterRegions()" />
+      <input type="text" id="r-search" placeholder="Search questions or answers… / 搜尋問題或答案…" oninput="filterRegions()" />
       <span class="badge" id="r-badge"></span>
     </div>
 
@@ -277,11 +318,26 @@
       <table class="regions" id="regions-table">
         <thead>
           <tr>
-            <th style="min-width:220px">Question / Topic</th>
-            <th class="col-eng">&#127988; England</th>
-            <th class="col-sco">&#127988; Scotland</th>
-            <th class="col-wal">&#127988; Wales</th>
-            <th class="col-ni" >&#127988; Northern Ireland</th>
+            <th style="min-width:220px">
+              <span class="en">Question / Topic</span>
+              <span class="zh">問題／主題</span>
+            </th>
+            <th class="col-eng">
+              <span class="en">&#127988; England</span>
+              <span class="zh">英格蘭</span>
+            </th>
+            <th class="col-sco">
+              <span class="en">&#127988; Scotland</span>
+              <span class="zh">蘇格蘭</span>
+            </th>
+            <th class="col-wal">
+              <span class="en">&#127988; Wales</span>
+              <span class="zh">威爾斯</span>
+            </th>
+            <th class="col-ni">
+              <span class="en">&#127988; Northern Ireland</span>
+              <span class="zh">北愛爾蘭</span>
+            </th>
             <th style="min-width:90px">Exams</th>
           </tr>
         </thead>
@@ -293,7 +349,7 @@
   <!-- ═══════════════════════ TAB 2 — TIMELINE ═════════════════════ -->
   <div id="tab-timeline" class="tab-panel">
     <div class="toolbar">
-      <input type="text" id="tl-search" placeholder="Search facts, years or periods…" oninput="filterTimeline()" />
+      <input type="text" id="tl-search" placeholder="Search facts, years or periods… / 搜尋史實、年份或時期…" oninput="filterTimeline()" />
       <span class="badge" id="tl-badge"></span>
     </div>
     <div class="era-filters" id="era-filters"></div>
@@ -314,11 +370,16 @@
 const _ver = new URLSearchParams(window.location.search).get('v') || '—';
 document.getElementById('ver-label').textContent = 'v' + _ver;
 
+// ── LANGUAGE TOGGLE ──────────────────────────────────────────────
+const ALL_ZH = { All: '全部', ...ERA_ZH };
+
+function setLang(lang) {
+  document.body.dataset.lang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + lang).classList.add('active');
+}
+
 // ── UNIQUE VIEW ─────────────────────────────────────────────────
-// When ON (default): Timeline hides items tagged forRegions:true
-//                    (those items are already shown in the Regions tab)
-// When OFF: all items visible in both tabs; cross-section items
-//           show a yellow badge to signal they appear in both.
 function isUniqueOn() {
   return document.getElementById('unique-toggle').checked;
 }
@@ -329,11 +390,10 @@ function applyUniqueView() {
   desc.textContent = unique
     ? 'Each topic shown in one section only — regional items hidden from Timeline'
     : 'All items visible in both sections — yellow badge marks cross-section items';
-  filterTimeline();   // re-run timeline filter
-  updateRegionBadges(); // update badges in Regions tab
+  filterTimeline();
+  updateRegionBadges();
 }
 
-// Show/hide "Also in Regions" badges on timeline items that forRegions:true
 function updateRegionBadges() {
   const unique = isUniqueOn();
   document.querySelectorAll('.tl-item[data-for-regions="1"]').forEach(el => {
@@ -351,9 +411,12 @@ function switchTab(id, btn) {
 }
 
 // ── REGIONS TABLE ───────────────────────────────────────────────
-function cell(val, cls) {
-  const isEmpty = !val || val === '—';
-  return `<td class="ans ${cls}${isEmpty ? ' empty' : ''}">${isEmpty ? '—' : val}</td>`;
+function cell(en, zh, cls) {
+  const isEmpty = !en || en === '—';
+  if (isEmpty) {
+    return `<td class="ans ${cls} empty">—</td>`;
+  }
+  return `<td class="ans ${cls}"><span class="en">${en}</span><span class="zh">${zh || ''}</span></td>`;
 }
 
 function renderRegions() {
@@ -365,17 +428,23 @@ function renderRegions() {
 
     if (row.category) {
       tr.className = 'cat-row';
-      tr.innerHTML = `<td colspan="6">${row.category}</td>`;
+      tr.innerHTML = `<td colspan="6"><span class="en">${row.category}</span><span class="zh">${row.category_zh || ''}</span></td>`;
     } else {
       const tags = (row.exams || []).map(e => `<span class="exam-tag">${e}</span>`).join('');
-      tr.dataset.q = [row.question, row.england, row.scotland, row.wales, row.ni]
-                       .join(' ').toLowerCase();
+      tr.dataset.q = [
+        row.question, row.question_zh,
+        row.england,  row.england_zh,
+        row.scotland, row.scotland_zh,
+        row.wales,    row.wales_zh,
+        row.ni,       row.ni_zh
+      ].filter(Boolean).join(' ').toLowerCase();
+
       tr.innerHTML = `
-        <td class="q-col">${row.question}</td>
-        ${cell(row.england, 'col-eng')}
-        ${cell(row.scotland,'col-sco')}
-        ${cell(row.wales,   'col-wal')}
-        ${cell(row.ni,      'col-ni')}
+        <td class="q-col"><span class="en">${row.question}</span><span class="zh">${row.question_zh || ''}</span></td>
+        ${cell(row.england,  row.england_zh,  'col-eng')}
+        ${cell(row.scotland, row.scotland_zh, 'col-sco')}
+        ${cell(row.wales,    row.wales_zh,    'col-wal')}
+        ${cell(row.ni,       row.ni_zh,       'col-ni')}
         <td><div class="exam-tags">${tags}</div></td>
       `;
     }
@@ -417,7 +486,8 @@ function renderEraFilters() {
   ['All', ...ERAS].forEach(era => {
     const b = document.createElement('button');
     b.className = 'era-btn' + (era === 'All' ? ' active' : '');
-    b.textContent = era;
+    const zhLabel = ALL_ZH[era] || '';
+    b.innerHTML = `<span class="en">${era}</span><span class="zh">${zhLabel}</span>`;
     b.onclick = () => {
       activeEra = era;
       document.querySelectorAll('.era-btn').forEach(x => x.classList.remove('active'));
@@ -439,23 +509,23 @@ function renderTimeline() {
       const h = document.createElement('div');
       h.className = 'era-label';
       h.dataset.era = item.era;
-      h.textContent = item.era;
+      h.innerHTML = `<span class="en">${item.era}</span><span class="zh">${ERA_ZH[item.era] || ''}</span>`;
       c.appendChild(h);
     }
     const tags = (item.exams || []).map(e => `<span class="exam-tag">Exam ${e}</span>`).join('');
     const badge = item.forRegions
-      ? `<span class="region-badge" style="display:none">&#128205; Also in Regions tab</span>`
+      ? `<span class="region-badge" style="display:none">&#128205; <span class="en">Also in Regions tab</span><span class="zh">已於地區標籤顯示</span></span>`
       : '';
     const div = document.createElement('div');
     div.className = 'tl-item';
-    div.dataset.era       = item.era;
-    div.dataset.text      = (item.fact + ' ' + item.year + ' ' + item.period).toLowerCase();
+    div.dataset.era        = item.era;
+    div.dataset.text       = [item.fact, item.fact_zh, item.year, item.period].filter(Boolean).join(' ').toLowerCase();
     div.dataset.forRegions = item.forRegions ? '1' : '0';
     div.innerHTML = `
       <div class="tl-year">${item.year}</div>
       <div class="tl-dot"></div>
       <div class="tl-box">
-        <div>${item.fact}</div>
+        <div><span class="en">${item.fact}</span><span class="zh">${item.fact_zh || ''}</span></div>
         <div class="exam-tags" style="margin-top:5px">${tags}${badge}</div>
       </div>`;
     c.appendChild(div);
@@ -467,8 +537,8 @@ function filterTimeline() {
   const q      = document.getElementById('tl-search').value.toLowerCase().trim();
   const unique = isUniqueOn();
   document.querySelectorAll('.tl-item').forEach(el => {
-    const eraOk     = activeEra === 'All' || el.dataset.era === activeEra;
-    const textOk    = !q || el.dataset.text.includes(q);
+    const eraOk      = activeEra === 'All' || el.dataset.era === activeEra;
+    const textOk     = !q || el.dataset.text.includes(q);
     const regionHide = unique && el.dataset.forRegions === '1';
     el.classList.toggle('hidden-tl', !(eraOk && textOk) || regionHide);
   });
@@ -491,7 +561,7 @@ function updateTLBadge() {
 renderRegions();
 renderEraFilters();
 renderTimeline();
-applyUniqueView(); // apply default unique=true on load
+applyUniqueView();
 </script>
 </body>
 </html>

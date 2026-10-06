@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Life in the UK Test — Study Guide</title>
+  <script src="data.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --uk-red:    #CF142B;
+      --uk-blue:   #00247D;
+      --uk-white:  #FFFFFF;
+      --eng:       #CF142B;
+      --sco:       #003F87;
+      --wal:       #00693E;
+      --ni:        #F6821F;
+      --bg:        #f4f6fb;
+      --card:      #ffffff;
+      --border:    #dde1ea;
+      --text:      #1a1d2e;
+      --muted:     #6b7280;
+      --radius:    8px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--uk-blue);
+      color: var(--uk-white);
+      padding: 20px 24px 0;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+    }
+    header p {
+      font-size: .875rem;
+      opacity: .8;
+      margin-top: 4px;
+    }
+    .flag-stripe {
+      height: 4px;
+      background: linear-gradient(90deg, var(--uk-red) 0%, var(--uk-red) 33%, var(--uk-white) 33%, var(--uk-white) 66%, var(--uk-red) 66%);
+      margin-top: 16px;
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      gap: 0;
+      background: var(--uk-blue);
+      padding: 0 24px;
+    }
+    .tab-btn {
+      padding: 12px 24px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,.65);
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: color .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: #fff; }
+    .tab-btn.active { color: #fff; border-bottom-color: var(--uk-red); }
+
+    /* ── MAIN ── */
+    main { padding: 24px; max-width: 1300px; margin: 0 auto; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── SEARCH BAR ── */
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .search-bar input {
+      flex: 1;
+      min-width: 200px;
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: .9rem;
+      outline: none;
+      background: var(--card);
+    }
+    .search-bar input:focus { border-color: var(--uk-blue); }
+    .count-badge {
+      font-size: .8rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ── REGION SECTION ── */
+    .region-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(640px, 1fr));
+      gap: 24px;
+    }
+    @media (max-width: 700px) {
+      .region-grid { grid-template-columns: 1fr; }
+    }
+
+    .region-card {
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .region-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--uk-white);
+    }
+    .region-header .flag { font-size: 1.4rem; }
+    .region-header.eng { background: var(--eng); }
+    .region-header.sco { background: var(--sco); }
+    .region-header.wal { background: var(--wal); }
+    .region-header.ni  { background: var(--ni); color: #1a1d2e; }
+
+    .region-card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .86rem;
+    }
+    .region-card th {
+      text-align: left;
+      padding: 8px 14px;
+      background: #f9fafb;
+      border-bottom: 1px solid var(--border);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+    }
+    .region-card td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #f0f2f5;
+      vertical-align: top;
+    }
+    .region-card tr:last-child td { border-bottom: none; }
+    .region-card tr:hover td { background: #f7f9ff; }
+    .region-card td.answer { font-weight: 600; color: var(--uk-blue); }
+    .exam-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .exam-tag {
+      display: inline-block;
+      font-size: .7rem;
+      background: #eef2ff;
+      color: var(--uk-blue);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-weight: 600;
+    }
+
+    /* ── TIMELINE ── */
+    .timeline-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .era-filter {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .era-filter:hover, .era-filter.active {
+      background: var(--uk-blue);
+      color: #fff;
+      border-color: var(--uk-blue);
+    }
+
+    .timeline { position: relative; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 110px;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    @media (max-width: 600px) {
+      .timeline::before { left: 70px; }
+    }
+
+    .tl-era-heading {
+      position: relative;
+      margin: 28px 0 12px 0;
+      padding-left: 130px;
+      font-weight: 700;
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+    }
+    .tl-era-heading::before {
+      content: '';
+      position: absolute;
+      left: 104px;
+      top: 50%;
+      width: 14px; height: 14px;
+      background: var(--uk-blue);
+      border: 3px solid var(--bg);
+      border-radius: 50%;
+      transform: translateY(-50%);
+    }
+
+    .tl-item {
+      display: flex;
+      gap: 0;
+      margin-bottom: 6px;
+      position: relative;
+      align-items: flex-start;
+    }
+    .tl-year {
+      width: 110px;
+      flex-shrink: 0;
+      text-align: right;
+      padding-right: 24px;
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding-top: 10px;
+      line-height: 1.3;
+    }
+    .tl-dot {
+      width: 10px; height: 10px;
+      background: var(--uk-red);
+      border: 2px solid var(--uk-white);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 13px;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 0 0 2px var(--border);
+    }
+    .tl-content {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 9px 14px;
+      margin-left: 16px;
+      font-size: .88rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+      transition: box-shadow .15s;
+    }
+    .tl-content:hover { box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+    .tl-fact { line-height: 1.5; }
+    .tl-exams { margin-top: 5px; }
+
+    .hidden-row { display: none; }
+    .hidden-item { display: none; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: .78rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>&#127468;&#127463; Life in the UK Test — Study Guide</h1>
+  <p>All questions & correct answers from Exams 1–17 · Two views: UK Regions &amp; Historical Timeline</p>
+  <div class="flag-stripe"></div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('regions', this)">&#127468;&#127463; UK Four Regions</button>
+  <button class="tab-btn" onclick="switchTab('timeline', this)">&#128336; Historical Timeline</button>
+</div>
+
+<main>
+
+  <!-- ═══════════════════════════════════════════════════
+       TAB 1 — UK FOUR REGIONS
+  ═══════════════════════════════════════════════════ -->
+  <div id="tab-regions" class="tab-panel active">
+
+    <div class="search-bar">
+      <input type="text" id="regions-search" placeholder="Search questions or answers…" oninput="filterRegions()" />
+      <span class="count-badge" id="regions-count"></span>
+    </div>
+
+    <div class="region-grid" id="regions-grid">
+
+      <div class="region-card" id="card-england">
+        <div class="region-header eng">
+          <span class="flag">&#127988;</span> England
+        </div>
+        <table id="table-england">
+          <thead>
+            <tr><th style="width:52%">Question</th><th style="width:35%">Answer</th><th>Exams</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="region-card" id="card-scotland">
+        <div class="region-header sco">
+          <span class="flag">&#127988;</span> Scotland
+        </div>
+        <table id="table-scotland">
+          <thead>
+            <tr><th style="width:52%">Question</th><th style="width:35%">Answer</th><th>Exams</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="region-card" id="card-wales">
+        <div class="region-header wal">
+          <span class="flag">&#127988;</span> Wales
+        </div>
+        <table id="table-wales">
+          <thead>
+            <tr><th style="width:52%">Question</th><th style="width:35%">Answer</th><th>Exams</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="region-card" id="card-northernIreland">
+        <div class="region-header ni">
+          <span class="flag">&#127988;</span> Northern Ireland
+        </div>
+        <table id="table-northernIreland">
+          <thead>
+            <tr><th style="width:52%">Question</th><th style="width:35%">Answer</th><th>Exams</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       TAB 2 — HISTORICAL TIMELINE
+  ═══════════════════════════════════════════════════ -->
+  <div id="tab-timeline" class="tab-panel">
+
+    <div class="search-bar">
+      <input type="text" id="timeline-search" placeholder="Search facts, years, or periods…" oninput="filterTimeline()" />
+      <span class="count-badge" id="timeline-count"></span>
+    </div>
+
+    <div class="timeline-controls" id="era-filters"></div>
+
+    <div class="timeline" id="timeline-container"></div>
+
+  </div>
+
+</main>
+
+<footer>
+  Source: <a href="https://lifeintheuktestweb.co.uk/exams-1-17/" target="_blank">lifeintheuktestweb.co.uk</a> &nbsp;·&nbsp;
+  Exams 1–17 &nbsp;·&nbsp; Built for GitHub Pages
+</footer>
+
+<script>
+// ──────────────────────────────────────────────
+// TAB SWITCHING
+// ──────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ──────────────────────────────────────────────
+// RENDER REGIONS TABLE
+// ──────────────────────────────────────────────
+function renderRegions() {
+  const keys = ['england', 'scotland', 'wales', 'northernIreland'];
+  keys.forEach(region => {
+    const tbody = document.querySelector('#table-' + region + ' tbody');
+    tbody.innerHTML = '';
+    REGIONS_DATA[region].forEach((item, i) => {
+      const tr = document.createElement('tr');
+      tr.dataset.q = item.question.toLowerCase();
+      tr.dataset.a = item.answer.toLowerCase();
+      tr.innerHTML = `
+        <td>${item.question}</td>
+        <td class="answer">${item.answer}</td>
+        <td><div class="exam-tags">${item.exams.map(e => `<span class="exam-tag">${e}</span>`).join('')}</div></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+  updateRegionsCount();
+}
+
+function filterRegions() {
+  const q = document.getElementById('regions-search').value.toLowerCase().trim();
+  document.querySelectorAll('#regions-grid table tbody tr').forEach(tr => {
+    const match = !q || tr.dataset.q.includes(q) || tr.dataset.a.includes(q);
+    tr.classList.toggle('hidden-row', !match);
+  });
+  updateRegionsCount();
+}
+
+function updateRegionsCount() {
+  const total = document.querySelectorAll('#regions-grid table tbody tr').length;
+  const visible = document.querySelectorAll('#regions-grid table tbody tr:not(.hidden-row)').length;
+  document.getElementById('regions-count').textContent =
+    visible === total ? `${total} questions total` : `${visible} of ${total} shown`;
+}
+
+// ──────────────────────────────────────────────
+// RENDER TIMELINE
+// ──────────────────────────────────────────────
+const ERAS = [...new Set(TIMELINE_DATA.map(d => d.era))];
+let activeEra = 'All';
+
+function renderEraFilters() {
+  const container = document.getElementById('era-filters');
+  ['All', ...ERAS].forEach(era => {
+    const btn = document.createElement('button');
+    btn.className = 'era-filter' + (era === 'All' ? ' active' : '');
+    btn.textContent = era;
+    btn.onclick = () => {
+      activeEra = era;
+      document.querySelectorAll('.era-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterTimeline();
+    };
+    container.appendChild(btn);
+  });
+}
+
+function renderTimeline() {
+  const container = document.getElementById('timeline-container');
+  container.innerHTML = '';
+
+  let currentEra = null;
+  TIMELINE_DATA.forEach((item, i) => {
+    if (item.era !== currentEra) {
+      currentEra = item.era;
+      const heading = document.createElement('div');
+      heading.className = 'tl-era-heading';
+      heading.dataset.era = item.era;
+      heading.textContent = item.era;
+      container.appendChild(heading);
+    }
+
+    const div = document.createElement('div');
+    div.className = 'tl-item';
+    div.dataset.era = item.era;
+    div.dataset.fact = item.fact.toLowerCase();
+    div.dataset.year = item.year.toLowerCase();
+    div.dataset.period = item.period.toLowerCase();
+    div.innerHTML = `
+      <div class="tl-year">${item.year}</div>
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <div class="tl-fact">${item.fact}</div>
+        <div class="tl-exams exam-tags">${item.exams.map(e => `<span class="exam-tag">Exam ${e}</span>`).join('')}</div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+  updateTimelineCount();
+}
+
+function filterTimeline() {
+  const q = document.getElementById('timeline-search').value.toLowerCase().trim();
+
+  // show/hide items
+  document.querySelectorAll('.tl-item').forEach(el => {
+    const eraMatch = activeEra === 'All' || el.dataset.era === activeEra;
+    const textMatch = !q || el.dataset.fact.includes(q) || el.dataset.year.includes(q) || el.dataset.period.includes(q);
+    el.classList.toggle('hidden-item', !(eraMatch && textMatch));
+  });
+
+  // hide era headings if all children hidden
+  document.querySelectorAll('.tl-era-heading').forEach(heading => {
+    const era = heading.dataset.era;
+    const anyVisible = [...document.querySelectorAll(`.tl-item[data-era="${era}"]`)]
+      .some(el => !el.classList.contains('hidden-item'));
+    heading.classList.toggle('hidden-item', !anyVisible);
+  });
+
+  updateTimelineCount();
+}
+
+function updateTimelineCount() {
+  const total = document.querySelectorAll('.tl-item').length;
+  const visible = document.querySelectorAll('.tl-item:not(.hidden-item)').length;
+  document.getElementById('timeline-count').textContent =
+    visible === total ? `${total} events total` : `${visible} of ${total} shown`;
+}
+
+// ──────────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────────
+renderRegions();
+renderEraFilters();
+renderTimeline();
+</script>
+</body>
+</html>

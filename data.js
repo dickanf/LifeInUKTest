@@ -1,137 +1,238 @@
 // Life in the UK Test — All Q&A data from Exams 1–17
 // Source: lifeintheuktestweb.co.uk
 
-const REGIONS_DATA = {
-  england: [
-    { question: "Patron Saint of England?", answer: "St George", exams: [10] },
-    { question: "St George's Day?", answer: "23rd April", exams: [13] },
-    { question: "Flower symbol of England?", answer: "Rose", exams: [16] },
-    { question: "Where is Big Ben located?", answer: "Houses of Parliament", exams: [1] },
-    { question: "Where are the Crown Jewels kept?", answer: "Tower of London", exams: [2] },
-    { question: "Who built the Tower of London?", answer: "William the Conqueror", exams: [6] },
-    { question: "Who are the Beefeaters?", answer: "Tour guides at the Tower of London", exams: [3, 13] },
-    { question: "What monument is in Wiltshire?", answer: "Stonehenge", exams: [14] },
-    { question: "Where is the Eden Project?", answer: "Cornwall", exams: [5] },
-    { question: "Largest National Park in England?", answer: "Lake District", exams: [3, 13] },
-    { question: "UK's favourite view voted in 2007?", answer: "Lake District (Wastwater)", exams: [7] },
-    { question: "Where is Theatreland located?", answer: "London's West End", exams: [11] },
-    { question: "Where is the Tate Art Gallery?", answer: "London", exams: [12] },
-    { question: "Where is the National Horseracing Museum?", answer: "Newmarket, Suffolk", exams: [13] },
-    { question: "Who rebuilt St Paul's Cathedral after the Great Fire of London?", answer: "Sir Christopher Wren", exams: [11] },
-    { question: "Who was born in Stratford-upon-Avon?", answer: "William Shakespeare", exams: [6, 9] },
-    { question: "Cricket competition between England & Australia?", answer: "The Ashes", exams: [7] },
-    { question: "Most famous tennis tournament in the UK?", answer: "Wimbledon", exams: [12] },
-    { question: "Major horse-racing event in England?", answer: "Royal Ascot", exams: [7] },
-    { question: "What type of event is the Grand National?", answer: "Horse Racing", exams: [4] },
-    { question: "Who was first to print books in England?", answer: "William Caxton", exams: [2, 13] },
-    { question: "Which court handles minor criminal cases in England?", answer: "Magistrates' Court", exams: [2] },
-    { question: "How many jury members in England, Wales & Northern Ireland?", answer: "12", exams: [2] },
-    { question: "Who was responsible for constructing the Great Western Railway?", answer: "Isambard Kingdom Brunel", exams: [16] },
-    { question: "What event was held at Crystal Palace, Hyde Park, 1851?", answer: "The Great Exhibition", exams: [9] },
-    { question: "Two forts that were part of Hadrian's Wall?", answer: "Vindolanda & Housesteads", exams: [15] },
-    { question: "What type of theatre area is in London?", answer: "Theatreland (West End)", exams: [11] },
-    { question: "Where is the Prime Minister's official home?", answer: "10 Downing Street", exams: [4] },
-    { question: "What is Lent?", answer: "The 40 days before Easter", exams: [1, 7] },
-    { question: "What was Sir Frank Whittle's invention in the 1930s?", answer: "Jet engine", exams: [1] },
-    { question: "What did Isaac Newton discover?", answer: "Gravity", exams: [10, 16] },
-    { question: "Who invented the World Wide Web?", answer: "Sir Tim Berners-Lee", exams: [12] },
-    { question: "Who developed radar?", answer: "Robert Watson-Watt", exams: [4] },
-    { question: "What did Alan Turing invent in the 1930s?", answer: "The Turing machine", exams: [15] },
-    { question: "Who split the atom for the first time?", answer: "Ernest Rutherford", exams: [15] },
-    { question: "Who co-discovered the structure of the DNA molecule?", answer: "Francis Crick", exams: [8, 16] },
-    { question: "Which two pop groups were famous in the Swinging Sixties?", answer: "The Beatles & The Rolling Stones", exams: [15] },
-    { question: "Who won the Football World Cup in 1966? (captain)", answer: "Bobby Moore (captain)", exams: [1] },
-    { question: "Who was voted the Greatest Briton of all time in 2002?", answer: "Winston Churchill", exams: [4, 12] },
-    { question: "Who was the first female Prime Minister of the UK?", answer: "Margaret Thatcher", exams: [1] },
-    { question: "Who was the first British Prime Minister?", answer: "Sir Robert Walpole", exams: [14] },
-    { question: "Who was Winston Churchill's successor as PM elected in 1945?", answer: "Clement Attlee", exams: [14] },
-    { question: "Which two parties formed a coalition government in 2010?", answer: "Conservative Party & Liberal Democrats", exams: [6] },
-    { question: "What is the Cenotaph?", answer: "A war memorial in Whitehall", exams: [1, 11] },
-    { question: "Who designed the Cenotaph?", answer: "Sir Edwin Lutyens", exams: [8] },
-    { question: "Where is the Cenotaph located?", answer: "Whitehall, London", exams: [11] },
-    { question: "How many times has the UK hosted the Olympics?", answer: "3 times", exams: [14] },
-    { question: "When did the UK host the Olympic Games most recently?", answer: "2012", exams: [12] },
-    { question: "Who chairs debates at the House of Commons?", answer: "The Speaker", exams: [1] },
-    { question: "What are the two Houses of Parliament?", answer: "House of Commons & House of Lords", exams: [4] },
-    { question: "Who appoints life peers in the House of Lords?", answer: "The monarch", exams: [14] },
-    { question: "Does Britain have a written constitution?", answer: "No", exams: [10] },
-    { question: "Is the BBC controlled by the government?", answer: "No", exams: [12] },
-    { question: "How often are UK general elections held?", answer: "Every 5 years", exams: [4] },
-    { question: "What is the minimum age to serve on a jury?", answer: "18", exams: [1] },
-    { question: "How is a jury selected?", answer: "Randomly from the electoral register", exams: [1] },
-    { question: "What is a bank holiday?", answer: "A public holiday when banks and many businesses are closed", exams: [1] },
-    { question: "What will you be given to vote before a general election?", answer: "A poll card", exams: [1] },
-    { question: "What type of media must give balanced political coverage?", answer: "Television & Radio", exams: [1, 4] },
-    { question: "What is canvassing?", answer: "Persuading people to vote for a political party", exams: [5] },
-    { question: "Minimum age to stand as an MP?", answer: "18", exams: [9] },
-    { question: "What is the Union Jack?", answer: "The Flag of the United Kingdom", exams: [12] },
-  ],
+// ─────────────────────────────────────────────────────────────────
+// REGIONS TABLE  (single unified table, one row per topic)
+// Use category:"..." rows to insert section headers
+// Use "" for cells that don't apply to a region
+// ─────────────────────────────────────────────────────────────────
+const REGIONS_TABLE = [
 
-  scotland: [
-    { question: "Patron Saint of Scotland?", answer: "St Andrew", exams: [1] },
-    { question: "St Andrew's Day?", answer: "30th November", exams: [11] },
-    { question: "Capital city of Scotland?", answer: "Edinburgh", exams: [7] },
-    { question: "Flower symbol of Scotland?", answer: "Thistle", exams: [8] },
-    { question: "What is Hogmanay?", answer: "New Year's Eve in Scotland", exams: [3, 9, 14] },
-    { question: "Song sung at New Year in UK?", answer: "Auld Lang Syne", exams: [15] },
-    { question: "What type of church is the Church of Scotland?", answer: "Presbyterian", exams: [5] },
-    { question: "Where did golf originate?", answer: "Scotland", exams: [2, 5] },
-    { question: "Traditional food from Scotland?", answer: "Haggis", exams: [6] },
-    { question: "What did John Logie Baird (Scottish) invent?", answer: "Television", exams: [2] },
-    { question: "Where is Loch Lomond & Trossachs National Park?", answer: "Scotland", exams: [10] },
-    { question: "Where is Skara Brae?", answer: "Scotland", exams: [17] },
-    { question: "Where is Crathes Castle?", answer: "Scotland", exams: [13] },
-    { question: "Where does the Edinburgh Fringe festival take place?", answer: "Edinburgh", exams: [10] },
-    { question: "Where does the Scottish Grand National take place?", answer: "Ayr", exams: [10] },
-    { question: "How many jury members in Scotland?", answer: "15", exams: [7] },
-    { question: "Which court handles minor criminal cases in Scotland?", answer: "Justice of the Peace Court", exams: [6] },
-    { question: "What church did Scotland establish in 1560?", answer: "A Protestant church", exams: [11] },
-    { question: "Who defeated the English at the Battle of Bannockburn (1314)?", answer: "Robert the Bruce", exams: [7, 12] },
-    { question: "Who supported Bonnie Prince Charlie in 1745?", answer: "Clansmen from the Scottish Highlands", exams: [3, 13] },
-    { question: "What were the Highland Clearances?", answer: "Landlords destroyed small farms to make space for sheep & cattle", exams: [7] },
-    { question: "Which Scottish clan was killed for not taking the oath?", answer: "MacDonalds of Glencoe", exams: [7] },
-    { question: "What can the Scottish Parliament legislate on?", answer: "Education (not Defence or Immigration)", exams: [17] },
-    { question: "What areas can devolved administrations pass laws on?", answer: "Health & Education", exams: [7] },
-    { question: "Who was supported by clansmen and raised army in 1745?", answer: "Bonnie Prince Charlie", exams: [3] },
-    { question: "What did Adam Smith develop ideas about during the Enlightenment?", answer: "Economics", exams: [14] },
-    { question: "What did David Hume contribute to during the Enlightenment?", answer: "Philosophy", exams: [17] },
-  ],
+  // ── SYMBOLS & IDENTITY ───────────────────────────────────────
+  { category: "Symbols & Identity" },
+  {
+    question: "Patron Saint?",
+    england: "St George", scotland: "St Andrew", wales: "St David", ni: "St Patrick",
+    exams: [1,3,5,10]
+  },
+  {
+    question: "Patron Saint's Day?",
+    england: "23rd April", scotland: "30th November", wales: "1st March", ni: "17th March",
+    exams: [8,11,13,14]
+  },
+  {
+    question: "Patron Saint's Day — public holiday?",
+    england: "No", scotland: "No", wales: "No", ni: "Yes",
+    exams: [2]
+  },
+  {
+    question: "Capital City?",
+    england: "London", scotland: "Edinburgh", wales: "Cardiff", ni: "Belfast",
+    exams: [3,7,9]
+  },
+  {
+    question: "Flower Symbol?",
+    england: "Rose", scotland: "Thistle", wales: "Daffodil", ni: "Shamrock",
+    exams: [4,8,9,16]
+  },
 
-  wales: [
-    { question: "Patron Saint of Wales?", answer: "St David", exams: [3] },
-    { question: "St David's Day?", answer: "1st March", exams: [8] },
-    { question: "Capital city of Wales?", answer: "Cardiff", exams: [3] },
-    { question: "Flower symbol of Wales?", answer: "Daffodil", exams: [4] },
-    { question: "Where is Snowdonia located?", answer: "Wales", exams: [3] },
-    { question: "Where is Swansea located?", answer: "Wales", exams: [6] },
-    { question: "Does Wales have its own established church?", answer: "No", exams: [3, 10] },
-    { question: "How many members in the Welsh Government?", answer: "60", exams: [10] },
-    { question: "How often are Welsh Government members elected?", answer: "Every 4 years", exams: [8] },
-    { question: "What two countries developed Concorde?", answer: "Britain & France", exams: [3, 14] },
-    { question: "What is Caernarfon Castle associated with?", answer: "Wales", exams: [13] },
-    { question: "Who wrote 'The Daffodils' (inspired by Daffodils)?", answer: "William Wordsworth", exams: [11] },
-  ],
+  // ── RELIGION & CHURCH ────────────────────────────────────────
+  { category: "Religion & Church" },
+  {
+    question: "Own established church?",
+    england: "Yes — Church of England", scotland: "Yes — Presbyterian", wales: "No", ni: "No",
+    exams: [3,5,6,10]
+  },
+  {
+    question: "Head of the Church of England?",
+    england: "The Monarch", scotland: "—", wales: "—", ni: "—",
+    exams: [4]
+  },
+  {
+    question: "Spiritual leader of Church of England?",
+    england: "Archbishop of Canterbury", scotland: "—", wales: "—", ni: "—",
+    exams: [13]
+  },
+  {
+    question: "When was a Protestant church established?",
+    england: "1534 (Church of England)", scotland: "1560", wales: "—", ni: "—",
+    exams: [3,11]
+  },
 
-  northernIreland: [
-    { question: "Patron Saint of Northern Ireland?", answer: "St Patrick", exams: [5] },
-    { question: "St Patrick's Day?", answer: "17th March", exams: [14] },
-    { question: "Is St Patrick's Day a public holiday in Northern Ireland?", answer: "Yes", exams: [2] },
-    { question: "Capital city of Northern Ireland?", answer: "Belfast", exams: [9] },
-    { question: "Flower symbol of Northern Ireland?", answer: "Shamrock", exams: [9] },
-    { question: "Where is the Giant's Causeway?", answer: "Northern Ireland", exams: [16] },
-    { question: "Traditional food of Northern Ireland?", answer: "Ulster Fry", exams: [14] },
-    { question: "Does Northern Ireland have its own established church?", answer: "No", exams: [6] },
-    { question: "Does Northern Ireland have its own banknotes?", answer: "Yes — valid everywhere in the UK", exams: [2, 8] },
-    { question: "How many members in the Northern Ireland Assembly?", answer: "90", exams: [12] },
-    { question: "How is the Northern Ireland Parliament elected?", answer: "Proportional representation", exams: [14] },
-    { question: "What can the NI Assembly NOT decide on?", answer: "Immigration & Defence", exams: [11] },
-    { question: "Has the UK government ever suspended the NI Assembly?", answer: "Yes", exams: [11] },
-    { question: "Who introduced the Scottish Parliament and Welsh Assembly?", answer: "Tony Blair", exams: [16] },
-    { question: "Who followed Thatcher and helped with the NI peace process?", answer: "John Major", exams: [16] },
-    { question: "Youth Court in NI heard by?", answer: "Up to 3 specially trained magistrates or a District Judge", exams: [15, 17] },
-  ]
-};
+  // ── GOVERNMENT & DEVOLUTION ──────────────────────────────────
+  { category: "Government & Devolution" },
+  {
+    question: "Own Parliament / Assembly?",
+    england: "— (Westminster)", scotland: "Scottish Parliament", wales: "Welsh Assembly", ni: "Northern Ireland Assembly",
+    exams: [16]
+  },
+  {
+    question: "Number of members?",
+    england: "—", scotland: "—", wales: "60", ni: "90",
+    exams: [10,12]
+  },
+  {
+    question: "Elected every?",
+    england: "—", scotland: "—", wales: "4 years", ni: "—",
+    exams: [8]
+  },
+  {
+    question: "Election method?",
+    england: "—", scotland: "—", wales: "—", ni: "Proportional representation",
+    exams: [14]
+  },
+  {
+    question: "Can legislate on: Health & Education?",
+    england: "—", scotland: "Yes", wales: "Yes", ni: "Yes",
+    exams: [7]
+  },
+  {
+    question: "Cannot legislate on?",
+    england: "—", scotland: "Defence, Immigration", wales: "—", ni: "Defence, Immigration",
+    exams: [7,11]
+  },
+  {
+    question: "Own banknotes (valid UK-wide)?",
+    england: "—", scotland: "Yes", wales: "—", ni: "Yes",
+    exams: [2,8]
+  },
 
+  // ── LEGAL SYSTEM ─────────────────────────────────────────────
+  { category: "Legal System" },
+  {
+    question: "Court for minor criminal cases?",
+    england: "Magistrates' Court", scotland: "Justice of the Peace Court", wales: "Magistrates' Court", ni: "Magistrates' Court",
+    exams: [2,6]
+  },
+  {
+    question: "Jury size?",
+    england: "12", scotland: "15", wales: "12", ni: "12",
+    exams: [2,7]
+  },
+  {
+    question: "Youth Court heard by?",
+    england: "Up to 3 magistrates or District Judge", scotland: "—", wales: "Up to 3 magistrates or District Judge", ni: "Up to 3 magistrates or District Judge",
+    exams: [15,16,17]
+  },
+  {
+    question: "Small claims max amount?",
+    england: "£10,000", scotland: "£5,000", wales: "£10,000", ni: "£5,000",
+    exams: [14,16]
+  },
+
+  // ── FOOD & TRADITIONS ─────────────────────────────────────────
+  { category: "Food & Traditions" },
+  {
+    question: "Traditional food?",
+    england: "—", scotland: "Haggis", wales: "—", ni: "Ulster Fry",
+    exams: [6,14]
+  },
+  {
+    question: "New Year's Eve name?",
+    england: "New Year's Eve", scotland: "Hogmanay", wales: "—", ni: "—",
+    exams: [3,9,14]
+  },
+  {
+    question: "New Year's Eve song (whole UK)?",
+    england: "Auld Lang Syne", scotland: "Auld Lang Syne", wales: "Auld Lang Syne", ni: "Auld Lang Syne",
+    exams: [15]
+  },
+
+  // ── GEOGRAPHY & LANDMARKS ────────────────────────────────────
+  { category: "Geography & Landmarks" },
+  {
+    question: "Famous National Park?",
+    england: "Lake District (largest in England)", scotland: "Loch Lomond & The Trossachs", wales: "Snowdonia", ni: "—",
+    exams: [3,10,13]
+  },
+  {
+    question: "Famous prehistoric site?",
+    england: "Stonehenge (Wiltshire)", scotland: "Skara Brae", wales: "—", ni: "—",
+    exams: [14,17]
+  },
+  {
+    question: "Famous natural landmark?",
+    england: "—", scotland: "—", wales: "—", ni: "Giant's Causeway",
+    exams: [16]
+  },
+  {
+    question: "Famous castle / historic building?",
+    england: "Tower of London", scotland: "Crathes Castle", wales: "Caernarfon Castle", ni: "—",
+    exams: [6,13]
+  },
+  {
+    question: "Cultural / festival location?",
+    england: "London West End (Theatreland)", scotland: "Edinburgh (Fringe Festival)", wales: "Cardiff / Swansea", ni: "Belfast",
+    exams: [3,6,10,11]
+  },
+
+  // ── SPORT ────────────────────────────────────────────────────
+  { category: "Sport" },
+  {
+    question: "Sport originated here?",
+    england: "Cricket (The Ashes)", scotland: "Golf", wales: "—", ni: "—",
+    exams: [2,5,7]
+  },
+  {
+    question: "Famous horse racing event / venue?",
+    england: "Royal Ascot; Newmarket (National Horseracing Museum)", scotland: "Ayr (Scottish Grand National)", wales: "—", ni: "—",
+    exams: [7,10,13]
+  },
+  {
+    question: "Famous tennis tournament?",
+    england: "Wimbledon", scotland: "—", wales: "—", ni: "—",
+    exams: [12]
+  },
+
+  // ── NOTABLE PEOPLE ────────────────────────────────────────────
+  { category: "Notable People" },
+  {
+    question: "Famous inventor / scientist?",
+    england: "Isaac Newton (gravity); Frank Whittle (jet engine); Alan Turing (Turing machine); Tim Berners-Lee (WWW); Francis Crick (DNA); Ernest Rutherford (atom)",
+    scotland: "John Logie Baird (TV); Alexander Fleming (penicillin)",
+    wales: "—", ni: "—",
+    exams: [1,2,10,12,15,16]
+  },
+  {
+    question: "Famous writer / poet?",
+    england: "William Shakespeare (Stratford-upon-Avon); William Wordsworth; Geoffrey Chaucer; William Caxton (printing)",
+    scotland: "Robert Burns",
+    wales: "—", ni: "—",
+    exams: [2,6,9,11,13]
+  },
+  {
+    question: "Famous political leader?",
+    england: "Winston Churchill; Margaret Thatcher (1st female PM); Oliver Cromwell; Sir Robert Walpole (1st PM)",
+    scotland: "Robert the Bruce; Bonnie Prince Charlie",
+    wales: "—", ni: "—",
+    exams: [1,2,4,7,11,13,14]
+  },
+
+  // ── KEY HISTORICAL EVENTS ─────────────────────────────────────
+  { category: "Key Historical Events" },
+  {
+    question: "Key battle?",
+    england: "Battle of Hastings 1066; Battle of Trafalgar 1805; Battle of Waterloo 1815",
+    scotland: "Battle of Bannockburn 1314 (Robert the Bruce defeated English)",
+    wales: "—",
+    ni: "Battle of the Boyne 1690 (James II defeated)",
+    exams: [1,4,7,9,12,17]
+  },
+  {
+    question: "Famous historic massacre / clearance?",
+    england: "—", scotland: "Glencoe Massacre (~1692); Highland Clearances", wales: "—", ni: "—",
+    exams: [7]
+  },
+  {
+    question: "When did region join the Union?",
+    england: "—", scotland: "Act of Union 1707", wales: "1536 (Laws in Wales Acts)", ni: "1800 (Acts of Union)",
+    exams: []
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────
+// TIMELINE DATA
+// ─────────────────────────────────────────────────────────────────
 const TIMELINE_DATA = [
   // PREHISTORIC
   { period: "Stone Age", year: "~800,000 BC", era: "Prehistoric", fact: "First people in Britain were hunter-gatherers", exams: [7] },
@@ -168,7 +269,6 @@ const TIMELINE_DATA = [
   { period: "Tudor", year: "~1476", era: "Tudor", fact: "William Caxton — first person to print books in England using a printing press", exams: [2, 13] },
   { period: "Tudor", year: "~1534", era: "Tudor", fact: "Henry VIII established the Church of England (the Reformation) — Pope refused his divorce from Catherine of Aragon", exams: [3, 6, 7] },
   { period: "Tudor", year: "~1536", era: "Tudor", fact: "Anne Boleyn executed at the Tower of London", exams: [4] },
-  { period: "Tudor", year: "~1540s", era: "Tudor", fact: "Reformation — movement against the Pope's authority", exams: [7, 9, 16] },
   { period: "Tudor", year: "~1558", era: "Tudor", fact: "Elizabeth I became Queen — Protestant; found balance between Catholic and extreme Protestant views", exams: [6, 13] },
   { period: "Tudor", year: "~1585", era: "Tudor", fact: "English settlers began colonising the eastern coast of America under Elizabeth I", exams: [6] },
   { period: "Tudor", year: "1588", era: "Tudor", fact: "English defeated the Spanish Armada sent by Spain to conquer England", exams: [1, 8, 13] },
@@ -180,7 +280,6 @@ const TIMELINE_DATA = [
   { period: "Stuart", year: "1649", era: "Stuart", fact: "Charles I executed after the Civil War — England briefly became a republic", exams: [6, 17] },
   { period: "Stuart", year: "~1650s", era: "Stuart", fact: "Oliver Cromwell given the title of Lord Protector (ruled England as a republic)", exams: [1] },
   { period: "Stuart", year: "~1651", era: "Stuart", fact: "Charles II hid in an oak tree after Civil War defeat, then escaped to Europe", exams: [5, 13] },
-  { period: "Stuart", year: "1660", era: "Stuart", fact: "Restoration — Charles II became King (the Restoration)", exams: [5] },
   { period: "Stuart", year: "1666", era: "Stuart", fact: "Great Fire of London during Charles II's reign; St Paul's Cathedral rebuilt by Sir Christopher Wren", exams: [4, 11] },
   { period: "Stuart", year: "1688", era: "Stuart", fact: "The Glorious Revolution — William of Orange (from Netherlands) invited to invade England; bloodless takeover", exams: [5, 16, 17] },
   { period: "Stuart", year: "1689", era: "Stuart", fact: "Bill of Rights confirmed — did NOT give women the right to vote; did NOT give all adult men the vote", exams: [1, 7] },

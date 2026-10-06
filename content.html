@@ -11,7 +11,7 @@
   <meta http-equiv="Expires"       content="0" />
 
   <!-- ── BUMP VERSION to match index.html on every deploy ── -->
-  <script src="data.js?v=20261006.3"></script>
+  <script src="data.js?v=20261006.4"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -201,6 +201,38 @@
 
     .hidden-tl { display: none; }
 
+    /* ── UNIQUE VIEW TOGGLE BAR ── */
+    .unique-bar {
+      display: flex; align-items: center; gap: 12px;
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 8px 20px; font-size: .82rem;
+    }
+    .unique-bar span { color: var(--muted); }
+
+    /* toggle switch */
+    .tog-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+    .tog-wrap input { display: none; }
+    .tog-track {
+      width: 38px; height: 20px; background: #ccc; border-radius: 20px;
+      position: relative; transition: background .2s; flex-shrink: 0;
+    }
+    .tog-track::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 16px; height: 16px; background: #fff; border-radius: 50%;
+      transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3);
+    }
+    .tog-wrap input:checked + .tog-track { background: var(--uk-blue); }
+    .tog-wrap input:checked + .tog-track::after { left: 20px; }
+    .tog-label { font-weight: 600; color: var(--text); }
+
+    /* cross-section badge (shown in non-unique mode) */
+    .region-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .68rem; background: #fff3cd; color: #856404;
+      border: 1px solid #ffc107; border-radius: 4px;
+      padding: 2px 7px; margin-top: 5px; font-weight: 600;
+    }
+
     footer {
       text-align:center; padding:20px; font-size:.75rem;
       color:var(--muted); border-top:1px solid var(--border); margin-top:36px;
@@ -220,6 +252,16 @@
 <div class="tabs">
   <button class="tab-btn active" onclick="switchTab('regions',this)">&#127468;&#127463; UK Four Regions</button>
   <button class="tab-btn"        onclick="switchTab('timeline',this)">&#128336; Historical Timeline</button>
+</div>
+
+<!-- ── UNIQUE VIEW TOGGLE ── -->
+<div class="unique-bar">
+  <label class="tog-wrap" title="When ON: items already shown in UK Regions tab are hidden from the Timeline tab">
+    <input type="checkbox" id="unique-toggle" checked onchange="applyUniqueView()" />
+    <span class="tog-track"></span>
+    <span class="tog-label">Unique View</span>
+  </label>
+  <span id="unique-desc">Each topic shown in one section only — regional items hidden from Timeline</span>
 </div>
 
 <main>
@@ -271,6 +313,34 @@
 // ── VERSION (read from URL param, set by index.html redirect) ───
 const _ver = new URLSearchParams(window.location.search).get('v') || '—';
 document.getElementById('ver-label').textContent = 'v' + _ver;
+
+// ── UNIQUE VIEW ─────────────────────────────────────────────────
+// When ON (default): Timeline hides items tagged forRegions:true
+//                    (those items are already shown in the Regions tab)
+// When OFF: all items visible in both tabs; cross-section items
+//           show a yellow badge to signal they appear in both.
+function isUniqueOn() {
+  return document.getElementById('unique-toggle').checked;
+}
+
+function applyUniqueView() {
+  const unique = isUniqueOn();
+  const desc = document.getElementById('unique-desc');
+  desc.textContent = unique
+    ? 'Each topic shown in one section only — regional items hidden from Timeline'
+    : 'All items visible in both sections — yellow badge marks cross-section items';
+  filterTimeline();   // re-run timeline filter
+  updateRegionBadges(); // update badges in Regions tab
+}
+
+// Show/hide "Also in Regions" badges on timeline items that forRegions:true
+function updateRegionBadges() {
+  const unique = isUniqueOn();
+  document.querySelectorAll('.tl-item[data-for-regions="1"]').forEach(el => {
+    const badge = el.querySelector('.region-badge');
+    if (badge) badge.style.display = unique ? 'none' : 'inline-flex';
+  });
+}
 
 // ── TAB SWITCH ──────────────────────────────────────────────────
 function switchTab(id, btn) {
@@ -373,16 +443,20 @@ function renderTimeline() {
       c.appendChild(h);
     }
     const tags = (item.exams || []).map(e => `<span class="exam-tag">Exam ${e}</span>`).join('');
+    const badge = item.forRegions
+      ? `<span class="region-badge" style="display:none">&#128205; Also in Regions tab</span>`
+      : '';
     const div = document.createElement('div');
     div.className = 'tl-item';
-    div.dataset.era  = item.era;
-    div.dataset.text = (item.fact + ' ' + item.year + ' ' + item.period).toLowerCase();
+    div.dataset.era       = item.era;
+    div.dataset.text      = (item.fact + ' ' + item.year + ' ' + item.period).toLowerCase();
+    div.dataset.forRegions = item.forRegions ? '1' : '0';
     div.innerHTML = `
       <div class="tl-year">${item.year}</div>
       <div class="tl-dot"></div>
       <div class="tl-box">
         <div>${item.fact}</div>
-        <div class="exam-tags" style="margin-top:5px">${tags}</div>
+        <div class="exam-tags" style="margin-top:5px">${tags}${badge}</div>
       </div>`;
     c.appendChild(div);
   });
@@ -390,11 +464,13 @@ function renderTimeline() {
 }
 
 function filterTimeline() {
-  const q = document.getElementById('tl-search').value.toLowerCase().trim();
+  const q      = document.getElementById('tl-search').value.toLowerCase().trim();
+  const unique = isUniqueOn();
   document.querySelectorAll('.tl-item').forEach(el => {
-    const eraOk  = activeEra === 'All' || el.dataset.era === activeEra;
-    const textOk = !q || el.dataset.text.includes(q);
-    el.classList.toggle('hidden-tl', !(eraOk && textOk));
+    const eraOk     = activeEra === 'All' || el.dataset.era === activeEra;
+    const textOk    = !q || el.dataset.text.includes(q);
+    const regionHide = unique && el.dataset.forRegions === '1';
+    el.classList.toggle('hidden-tl', !(eraOk && textOk) || regionHide);
   });
   document.querySelectorAll('.era-label').forEach(h => {
     const any = [...document.querySelectorAll(`.tl-item[data-era="${h.dataset.era}"]`)]
@@ -415,6 +491,7 @@ function updateTLBadge() {
 renderRegions();
 renderEraFilters();
 renderTimeline();
+applyUniqueView(); // apply default unique=true on load
 </script>
 </body>
 </html>

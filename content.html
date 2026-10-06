@@ -11,7 +11,7 @@
   <meta http-equiv="Expires"       content="0" />
 
   <!-- ── BUMP VERSION to match index.html on every deploy ── -->
-  <script src="data.js?v=20261006.10"></script>
+  <script src="data.js?v=20261006.11"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -287,6 +287,11 @@
     }
     footer a { color: var(--uk-blue); }
     .ver { opacity:.5; }
+
+    /* ── HIGHLIGHT FLASH (global search navigation) ── */
+    @keyframes flashBg { 0% { background:#fffbe6; box-shadow:0 0 0 3px #f0a500; } 100% { background:inherit; box-shadow:none; } }
+    .highlight-flash td { animation: flashBg 2s ease-out; }
+    .tl-box.highlight-flash { animation: flashBg 2s ease-out; }
   </style>
 </head>
 <body data-lang="both">
@@ -454,24 +459,71 @@ function clearGlobalSearch() {
   document.querySelector('main').classList.remove('searching');
 }
 
+// ── NAVIGATE TO SPECIFIC ITEM ────────────────────────────────────
+function goToRegionRow(idx) {
+  clearGlobalSearch();
+  const btn = document.querySelectorAll('.tab-btn')[0];
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-regions').classList.add('active');
+  btn.classList.add('active');
+  setTimeout(() => {
+    const el = document.getElementById('r-' + idx);
+    if (!el) return;
+    el.classList.remove('hidden-row');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('highlight-flash');
+    setTimeout(() => el.classList.remove('highlight-flash'), 2000);
+  }, 80);
+}
+
+function goToTimelineItem(idx) {
+  clearGlobalSearch();
+  const btn = document.querySelectorAll('.tab-btn')[1];
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-timeline').classList.add('active');
+  btn.classList.add('active');
+  // If unique view is hiding this item, turn it off so it becomes visible
+  const el = document.getElementById('tl-' + idx);
+  if (el && el.dataset.forRegions === '1' && isUniqueOn()) {
+    document.getElementById('unique-toggle').checked = false;
+    applyUniqueView();
+  }
+  setTimeout(() => {
+    const el2 = document.getElementById('tl-' + idx);
+    if (!el2) return;
+    el2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const box = el2.querySelector('.tl-box');
+    if (box) {
+      box.classList.add('highlight-flash');
+      setTimeout(() => box.classList.remove('highlight-flash'), 2000);
+    }
+  }, 80);
+}
+
 function renderGlobalResults(q) {
   const panel = document.getElementById('global-results');
   panel.innerHTML = '';
 
-  const regionMatches = REGIONS_TABLE.filter(row => {
-    if (row.category) return false;
-    return [row.question, row.question_zh,
-            row.england,  row.england_zh,
-            row.scotland, row.scotland_zh,
-            row.wales,    row.wales_zh,
-            row.ni,       row.ni_zh]
-      .filter(Boolean).some(v => v.toLowerCase().includes(q));
-  });
+  const regionMatches = REGIONS_TABLE
+    .map((row, idx) => ({ row, idx }))
+    .filter(({ row }) => {
+      if (row.category) return false;
+      return [row.question, row.question_zh,
+              row.england,  row.england_zh,
+              row.scotland, row.scotland_zh,
+              row.wales,    row.wales_zh,
+              row.ni,       row.ni_zh]
+        .filter(Boolean).some(v => v.toLowerCase().includes(q));
+    });
 
-  const tlMatches = TIMELINE_DATA.filter(item =>
-    [item.fact, item.fact_zh, item.year, item.period, item.era]
-      .filter(Boolean).some(v => v.toLowerCase().includes(q))
-  );
+  const tlMatches = TIMELINE_DATA
+    .map((item, idx) => ({ item, idx }))
+    .filter(({ item }) =>
+      [item.fact, item.fact_zh, item.year, item.period, item.era]
+        .filter(Boolean).some(v => v.toLowerCase().includes(q))
+    );
 
   const total = regionMatches.length + tlMatches.length;
   document.getElementById('g-badge').textContent =
@@ -489,14 +541,11 @@ function renderGlobalResults(q) {
     h.textContent = `🏴 UK Four Regions — ${regionMatches.length} match${regionMatches.length > 1 ? 'es' : ''}`;
     panel.appendChild(h);
 
-    regionMatches.forEach(row => {
+    regionMatches.forEach(({ row, idx }) => {
       const div = document.createElement('div');
       div.className = 'gr-item';
-      div.title = 'Click to open Regions tab';
-      div.onclick = () => {
-        clearGlobalSearch();
-        switchTab('regions', document.querySelectorAll('.tab-btn')[0]);
-      };
+      div.title = 'Click to go to this row';
+      div.onclick = () => goToRegionRow(idx);
 
       const cols = [
         { en: row.england,  zh: row.england_zh,  cls: 'gr-ans-eng', label: 'England 英格蘭' },
@@ -532,14 +581,11 @@ function renderGlobalResults(q) {
     h.textContent = `🕐 Historical Timeline — ${tlMatches.length} match${tlMatches.length > 1 ? 'es' : ''}`;
     panel.appendChild(h);
 
-    tlMatches.forEach(item => {
+    tlMatches.forEach(({ item, idx }) => {
       const div = document.createElement('div');
       div.className = 'gr-item';
-      div.title = 'Click to open Timeline tab';
-      div.onclick = () => {
-        clearGlobalSearch();
-        switchTab('timeline', document.querySelectorAll('.tab-btn')[1]);
-      };
+      div.title = 'Click to go to this event';
+      div.onclick = () => goToTimelineItem(idx);
 
       const tags = (item.exams || []).map(e => `<span class="exam-tag">Exam ${e}</span>`).join('');
       const eraZh = ALL_ZH[item.era] || '';
@@ -571,12 +617,13 @@ function cell(en, zh, cls) {
 function renderRegions() {
   const tbody = document.getElementById('regions-body');
   tbody.innerHTML = '';
-  REGIONS_TABLE.forEach(row => {
+  REGIONS_TABLE.forEach((row, idx) => {
     const tr = document.createElement('tr');
     if (row.category) {
       tr.className = 'cat-row';
       tr.innerHTML = `<td colspan="6"><span class="en">${row.category}</span><span class="zh">${row.category_zh || ''}</span></td>`;
     } else {
+      tr.id = 'r-' + idx;
       const tags = (row.exams || []).map(e => `<span class="exam-tag">${e}</span>`).join('');
       tr.dataset.q = [row.question, row.question_zh, row.england, row.england_zh,
                       row.scotland, row.scotland_zh, row.wales, row.wales_zh,
@@ -641,7 +688,7 @@ function renderTimeline() {
   const c = document.getElementById('tl-container');
   c.innerHTML = '';
   let curEra = null;
-  TIMELINE_DATA.forEach(item => {
+  TIMELINE_DATA.forEach((item, idx) => {
     if (item.era !== curEra) {
       curEra = item.era;
       const h = document.createElement('div');
@@ -656,6 +703,7 @@ function renderTimeline() {
       : '';
     const div = document.createElement('div');
     div.className = 'tl-item';
+    div.id             = 'tl-' + idx;
     div.dataset.era        = item.era;
     div.dataset.text       = [item.fact, item.fact_zh, item.year, item.period].filter(Boolean).join(' ').toLowerCase();
     div.dataset.forRegions = item.forRegions ? '1' : '0';

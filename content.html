@@ -11,7 +11,7 @@
   <meta http-equiv="Expires"       content="0" />
 
   <!-- ── BUMP VERSION to match index.html on every deploy ── -->
-  <script src="data.js?v=20261006.7"></script>
+  <script src="data.js?v=20261006.8"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,16 +36,8 @@
 
     /* ── BILINGUAL SPANS ── */
     .zh { display: block; color: var(--zh-color); font-size: .88em; margin-top: 2px; }
-
-    /* English-only mode: hide Chinese */
     body[data-lang="en"] .zh { display: none !important; }
-    /* Chinese-only mode: hide English */
     body[data-lang="zh"] .en { display: none !important; }
-    /* "both" mode: show both (default, no extra rule needed) */
-
-    /* In "zh-only" mode, make empty cells still readable */
-    body[data-lang="zh"] .en.q-col-en,
-    body[data-lang="zh"] td.ans .en { display: none !important; }
 
     /* ── HEADER ── */
     header { background: var(--uk-blue); color: #fff; padding: 18px 24px 0; }
@@ -64,15 +56,125 @@
     .tab-btn:hover { color: #fff; }
     .tab-btn.active { color: #fff; border-bottom-color: var(--uk-red); }
 
+    /* ── GLOBAL SEARCH BAR ── */
+    .global-search-bar {
+      background: #001a5e; padding: 10px 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .global-search-bar label {
+      color: rgba(255,255,255,.7); font-size: .8rem; font-weight: 600; white-space: nowrap;
+    }
+    .global-search-bar input {
+      flex: 1; padding: 8px 14px; border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.25); font-size: .9rem; outline: none;
+      background: rgba(255,255,255,.12); color: #fff;
+    }
+    .global-search-bar input::placeholder { color: rgba(255,255,255,.45); }
+    .global-search-bar input:focus { background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.5); }
+    .g-clear-btn {
+      background: rgba(255,255,255,.15); border: none; color: rgba(255,255,255,.8);
+      font-size: .85rem; cursor: pointer; padding: 6px 10px; border-radius: 6px;
+      display: none; white-space: nowrap; font-weight: 600;
+    }
+    .g-clear-btn:hover { background: rgba(255,255,255,.25); color: #fff; }
+    .g-badge { font-size: .78rem; color: rgba(255,255,255,.6); white-space: nowrap; min-width: 60px; }
+
+    /* ── CONTROL BAR ── */
+    .unique-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 8px 20px; font-size: .82rem;
+    }
+    .unique-bar-left { display: flex; align-items: center; gap: 12px; }
+    .unique-bar span.desc { color: var(--muted); }
+
+    .tog-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+    .tog-wrap input { display: none; }
+    .tog-track {
+      width: 38px; height: 20px; background: #ccc; border-radius: 20px;
+      position: relative; transition: background .2s; flex-shrink: 0;
+    }
+    .tog-track::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 16px; height: 16px; background: #fff; border-radius: 50%;
+      transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3);
+    }
+    .tog-wrap input:checked + .tog-track { background: var(--uk-blue); }
+    .tog-wrap input:checked + .tog-track::after { left: 20px; }
+    .tog-label { font-weight: 600; color: var(--text); }
+
+    .region-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .68rem; background: #fff3cd; color: #856404;
+      border: 1px solid #ffc107; border-radius: 4px;
+      padding: 2px 7px; margin-top: 5px; font-weight: 600;
+    }
+    .region-badge .zh { display: inline; font-size: 1em; margin-top: 0; color: #856404; }
+
+    .lang-btns { display: flex; gap: 4px; }
+    .lang-btn {
+      padding: 4px 11px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--bg); font-size: .78rem; font-weight: 600;
+      cursor: pointer; color: var(--muted); transition: .15s;
+    }
+    .lang-btn:hover { border-color: var(--uk-blue); color: var(--uk-blue); }
+    .lang-btn.active { background: var(--uk-blue); color: #fff; border-color: var(--uk-blue); }
+
     /* ── LAYOUT ── */
     main { padding: 20px 16px; max-width: 1400px; margin: 0 auto; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* ── SEARCH ── */
-    .toolbar {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
+    /* Global search active: hide tabs, show results */
+    main.searching .tab-panel { display: none !important; }
+    #global-results { display: none; }
+    main.searching #global-results { display: block; }
+
+    /* ── GLOBAL RESULTS ── */
+    .gr-section-title {
+      font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--muted); margin: 20px 0 10px; padding-left: 2px;
     }
+    .gr-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 11px 14px; margin-bottom: 8px;
+      cursor: pointer; transition: box-shadow .15s, border-color .15s;
+    }
+    .gr-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,.1); border-color: var(--uk-blue); }
+    .gr-source {
+      display: inline-block; font-size: .68rem; font-weight: 700;
+      padding: 2px 7px; border-radius: 4px; margin-bottom: 6px;
+    }
+    .gr-source-regions  { background: #e8f0fe; color: var(--uk-blue); }
+    .gr-source-timeline { background: #fce8e6; color: var(--uk-red); }
+
+    .gr-question { font-weight: 600; font-size: .88rem; margin-bottom: 6px; }
+    .gr-question .zh { margin-top: 1px; }
+    .gr-answers { display: flex; flex-wrap: wrap; gap: 6px; }
+    .gr-ans {
+      font-size: .8rem; padding: 4px 10px; border-radius: 5px;
+      border-left: 3px solid; line-height: 1.3;
+    }
+    .gr-ans-eng { border-color: var(--eng); background: #fff5f5; color: #7a1020; }
+    .gr-ans-sco { border-color: var(--sco); background: #f0f4ff; color: #002060; }
+    .gr-ans-wal { border-color: var(--wal); background: #f0fff4; color: #004d2e; }
+    .gr-ans-ni  { border-color: var(--ni);  background: #fff8f0; color: #7a3300; }
+    .gr-ans .zh { font-size: .85em; color: var(--zh-color); margin-top: 2px; }
+    .gr-ans-label { font-size: .68rem; font-weight: 700; opacity: .65; display: block; margin-bottom: 1px; }
+
+    .gr-tl-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .gr-year { font-size: .75rem; font-weight: 700; color: var(--muted); }
+    .gr-era  { font-size: .68rem; border-radius: 3px; padding: 1px 6px;
+               font-weight: 600; background: #eef2ff; color: var(--uk-blue); }
+    .gr-era .zh { display: inline; font-size: .9em; margin-top: 0; color: var(--uk-blue); }
+    .gr-fact { font-size: .86rem; }
+    .gr-fact .zh { margin-top: 3px; }
+
+    .gr-empty { color: var(--muted); font-size: .9rem; padding: 40px 0; text-align: center; }
+
+    /* ── TAB SEARCH TOOLBARS ── */
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
     .toolbar input {
       flex: 1; min-width: 180px; padding: 8px 13px;
       border: 1px solid var(--border); border-radius: var(--radius);
@@ -83,87 +185,46 @@
 
     /* ── REGIONS TABLE ── */
     .regions-wrap {
-      overflow-x: auto;
-      border-radius: 10px;
+      overflow-x: auto; border-radius: 10px;
       border: 1px solid var(--border);
-      box-shadow: 0 1px 6px rgba(0,0,0,.07);
-      background: var(--card);
+      box-shadow: 0 1px 6px rgba(0,0,0,.07); background: var(--card);
     }
+    table.regions { width: 100%; border-collapse: collapse; font-size: .84rem; }
 
-    table.regions {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .84rem;
-    }
-
-    /* sticky header */
     table.regions thead th {
-      position: sticky; top: 0; z-index: 2;
-      padding: 12px 14px;
-      background: var(--uk-blue);
-      color: #fff;
-      font-size: .8rem;
-      font-weight: 700;
-      text-align: left;
-      white-space: nowrap;
+      position: sticky; top: 0; z-index: 2; padding: 12px 14px;
+      background: var(--uk-blue); color: #fff; font-size: .8rem;
+      font-weight: 700; text-align: left; white-space: nowrap;
       border-right: 1px solid rgba(255,255,255,.15);
     }
     table.regions thead th:last-child { border-right: none; }
     table.regions thead th .zh { color: #c8cfe0; }
-
-    /* colour bands on column headers */
     table.regions thead th.col-eng { background: var(--eng); }
     table.regions thead th.col-sco { background: var(--sco); }
     table.regions thead th.col-wal { background: var(--wal); }
     table.regions thead th.col-ni  { background: var(--ni);  }
 
-    /* category rows */
     table.regions tr.cat-row td {
-      padding: 8px 14px;
-      background: #eef1f8;
-      font-weight: 700;
-      font-size: .75rem;
-      text-transform: uppercase;
-      letter-spacing: .8px;
-      color: var(--uk-blue);
-      border-top: 2px solid var(--border);
+      padding: 8px 14px; background: #eef1f8; font-weight: 700;
+      font-size: .75rem; text-transform: uppercase; letter-spacing: .8px;
+      color: var(--uk-blue); border-top: 2px solid var(--border);
     }
-    table.regions tr.cat-row td .zh {
-      font-size: .85em; letter-spacing: 0; text-transform: none;
-    }
+    table.regions tr.cat-row td .zh { font-size: .85em; letter-spacing: 0; text-transform: none; }
 
-    /* data rows */
     table.regions tbody tr td {
-      padding: 9px 14px;
-      border-bottom: 1px solid #f0f2f6;
-      border-right: 1px solid #f0f2f6;
-      vertical-align: top;
-      line-height: 1.45;
+      padding: 9px 14px; border-bottom: 1px solid #f0f2f6;
+      border-right: 1px solid #f0f2f6; vertical-align: top; line-height: 1.45;
     }
     table.regions tbody tr td:last-child { border-right: none; }
     table.regions tbody tr:last-child td { border-bottom: none; }
     table.regions tbody tr:hover td { background: #f7f9ff; }
 
-    /* question column */
     table.regions tbody tr td.q-col {
-      font-weight: 600;
-      color: var(--text);
-      min-width: 220px;
-      max-width: 260px;
+      font-weight: 600; color: var(--text); min-width: 220px; max-width: 260px;
     }
+    table.regions tbody tr td.ans { color: #1a3a6e; min-width: 160px; }
+    table.regions tbody tr td.ans.empty { color: #ccc; font-style: italic; font-size: .78rem; }
 
-    /* answer cells */
-    table.regions tbody tr td.ans {
-      color: #1a3a6e;
-      min-width: 160px;
-    }
-    table.regions tbody tr td.ans.empty {
-      color: #ccc;
-      font-style: italic;
-      font-size: .78rem;
-    }
-
-    /* left border accent per column */
     table.regions tbody tr td.col-eng { border-left: 3px solid var(--eng); }
     table.regions tbody tr td.col-sco { border-left: 3px solid var(--sco); }
     table.regions tbody tr td.col-wal { border-left: 3px solid var(--wal); }
@@ -174,7 +235,6 @@
       font-size: .68rem; background: #eef2ff; color: var(--uk-blue);
       border-radius: 3px; padding: 1px 5px; font-weight: 600;
     }
-
     .hidden-row { display: none; }
 
     /* ── TIMELINE ── */
@@ -182,8 +242,7 @@
     .era-btn {
       padding: 5px 13px; border-radius: 20px; border: 1px solid var(--border);
       background: var(--card); font-size: .8rem; font-weight: 600;
-      cursor: pointer; transition: .15s; line-height: 1.4;
-      text-align: center;
+      cursor: pointer; transition: .15s; line-height: 1.4; text-align: center;
     }
     .era-btn .zh { margin-top: 0; font-size: .75em; }
     .era-btn:hover, .era-btn.active { background: var(--uk-blue); color: #fff; border-color: var(--uk-blue); }
@@ -220,53 +279,7 @@
       font-size:.86rem; box-shadow:0 1px 3px rgba(0,0,0,.04);
     }
     .tl-box:hover { box-shadow:0 2px 8px rgba(0,0,0,.1); }
-
     .hidden-tl { display: none; }
-
-    /* ── CONTROL BAR (unique view + language toggle) ── */
-    .unique-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; flex-wrap: wrap;
-      background: #fff; border-bottom: 1px solid var(--border);
-      padding: 8px 20px; font-size: .82rem;
-    }
-    .unique-bar-left { display: flex; align-items: center; gap: 12px; }
-    .unique-bar span.desc { color: var(--muted); }
-
-    /* toggle switch */
-    .tog-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
-    .tog-wrap input { display: none; }
-    .tog-track {
-      width: 38px; height: 20px; background: #ccc; border-radius: 20px;
-      position: relative; transition: background .2s; flex-shrink: 0;
-    }
-    .tog-track::after {
-      content: ''; position: absolute; top: 2px; left: 2px;
-      width: 16px; height: 16px; background: #fff; border-radius: 50%;
-      transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3);
-    }
-    .tog-wrap input:checked + .tog-track { background: var(--uk-blue); }
-    .tog-wrap input:checked + .tog-track::after { left: 20px; }
-    .tog-label { font-weight: 600; color: var(--text); }
-
-    /* cross-section badge (shown in non-unique mode) */
-    .region-badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      font-size: .68rem; background: #fff3cd; color: #856404;
-      border: 1px solid #ffc107; border-radius: 4px;
-      padding: 2px 7px; margin-top: 5px; font-weight: 600;
-    }
-    .region-badge .zh { display: inline; font-size: 1em; margin-top: 0; color: #856404; }
-
-    /* ── LANGUAGE TOGGLE BUTTONS ── */
-    .lang-btns { display: flex; gap: 4px; }
-    .lang-btn {
-      padding: 4px 11px; border-radius: 6px; border: 1px solid var(--border);
-      background: var(--bg); font-size: .78rem; font-weight: 600;
-      cursor: pointer; color: var(--muted); transition: .15s;
-    }
-    .lang-btn:hover { border-color: var(--uk-blue); color: var(--uk-blue); }
-    .lang-btn.active { background: var(--uk-blue); color: #fff; border-color: var(--uk-blue); }
 
     footer {
       text-align:center; padding:20px; font-size:.75rem;
@@ -289,10 +302,20 @@
   <button class="tab-btn"        onclick="switchTab('timeline',this)">&#128336; Historical Timeline</button>
 </div>
 
-<!-- ── CONTROL BAR: Unique View toggle + Language switcher ── -->
+<!-- ── GLOBAL SEARCH BAR ── -->
+<div class="global-search-bar">
+  <label for="g-search">&#128269;</label>
+  <input type="text" id="g-search"
+         placeholder="Search everything — regions &amp; timeline / 全域搜尋…"
+         oninput="globalSearch()" />
+  <button class="g-clear-btn" id="g-clear" onclick="clearGlobalSearch()">&#10005; Clear</button>
+  <span class="g-badge" id="g-badge"></span>
+</div>
+
+<!-- ── CONTROL BAR: Unique View + Language ── -->
 <div class="unique-bar">
   <div class="unique-bar-left">
-    <label class="tog-wrap" title="When ON: items already shown in UK Regions tab are hidden from the Timeline tab">
+    <label class="tog-wrap" title="When ON: items already in UK Regions tab are hidden from Timeline">
       <input type="checkbox" id="unique-toggle" checked onchange="applyUniqueView()" />
       <span class="tog-track"></span>
       <span class="tog-label">Unique View</span>
@@ -308,13 +331,15 @@
 
 <main>
 
+  <!-- ═══════════ GLOBAL SEARCH RESULTS ═══════════ -->
+  <div id="global-results"></div>
+
   <!-- ═══════════════════════ TAB 1 — REGIONS ═══════════════════════ -->
   <div id="tab-regions" class="tab-panel active">
     <div class="toolbar">
-      <input type="text" id="r-search" placeholder="Search questions or answers… / 搜尋問題或答案…" oninput="filterRegions()" />
+      <input type="text" id="r-search" placeholder="Filter within Regions… / 篩選地區…" oninput="filterRegions()" />
       <span class="badge" id="r-badge"></span>
     </div>
-
     <div class="regions-wrap">
       <table class="regions" id="regions-table">
         <thead>
@@ -350,7 +375,7 @@
   <!-- ═══════════════════════ TAB 2 — TIMELINE ═════════════════════ -->
   <div id="tab-timeline" class="tab-panel">
     <div class="toolbar">
-      <input type="text" id="tl-search" placeholder="Search facts, years or periods… / 搜尋史實、年份或時期…" oninput="filterTimeline()" />
+      <input type="text" id="tl-search" placeholder="Filter within Timeline… / 篩選時間軸…" oninput="filterTimeline()" />
       <span class="badge" id="tl-badge"></span>
     </div>
     <div class="era-filters" id="era-filters"></div>
@@ -367,11 +392,11 @@
 </footer>
 
 <script>
-// ── VERSION (read from URL param, set by index.html redirect) ───
+// ── VERSION ──────────────────────────────────────────────────────
 const _ver = new URLSearchParams(window.location.search).get('v') || '—';
 document.getElementById('ver-label').textContent = 'v' + _ver;
 
-// ── LANGUAGE TOGGLE ──────────────────────────────────────────────
+// ── LANGUAGE ─────────────────────────────────────────────────────
 const ALL_ZH = { All: '全部', ...(typeof ERA_ZH !== 'undefined' ? ERA_ZH : {}) };
 
 function setLang(lang) {
@@ -380,15 +405,12 @@ function setLang(lang) {
   document.getElementById('btn-' + lang).classList.add('active');
 }
 
-// ── UNIQUE VIEW ─────────────────────────────────────────────────
-function isUniqueOn() {
-  return document.getElementById('unique-toggle').checked;
-}
+// ── UNIQUE VIEW ───────────────────────────────────────────────────
+function isUniqueOn() { return document.getElementById('unique-toggle').checked; }
 
 function applyUniqueView() {
   const unique = isUniqueOn();
-  const desc = document.getElementById('unique-desc');
-  desc.textContent = unique
+  document.getElementById('unique-desc').textContent = unique
     ? 'Each topic shown in one section only — regional items hidden from Timeline'
     : 'All items visible in both sections — yellow badge marks cross-section items';
   filterTimeline();
@@ -398,56 +420,174 @@ function applyUniqueView() {
 function updateRegionBadges() {
   const unique = isUniqueOn();
   document.querySelectorAll('.tl-item[data-for-regions="1"]').forEach(el => {
-    const badge = el.querySelector('.region-badge');
-    if (badge) badge.style.display = unique ? 'none' : 'inline-flex';
+    const b = el.querySelector('.region-badge');
+    if (b) b.style.display = unique ? 'none' : 'inline-flex';
   });
 }
 
-// ── TAB SWITCH ──────────────────────────────────────────────────
+// ── TAB SWITCH ────────────────────────────────────────────────────
 function switchTab(id, btn) {
+  clearGlobalSearch();
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   btn.classList.add('active');
 }
 
-// ── REGIONS TABLE ───────────────────────────────────────────────
-function cell(en, zh, cls) {
-  const isEmpty = !en || en === '—';
-  if (isEmpty) {
-    return `<td class="ans ${cls} empty">—</td>`;
+// ── GLOBAL SEARCH ─────────────────────────────────────────────────
+function globalSearch() {
+  const q = document.getElementById('g-search').value.toLowerCase().trim();
+  document.getElementById('g-clear').style.display = q ? 'inline-block' : 'none';
+  if (!q) {
+    document.querySelector('main').classList.remove('searching');
+    document.getElementById('g-badge').textContent = '';
+    return;
   }
+  document.querySelector('main').classList.add('searching');
+  renderGlobalResults(q);
+}
+
+function clearGlobalSearch() {
+  document.getElementById('g-search').value = '';
+  document.getElementById('g-clear').style.display = 'none';
+  document.getElementById('g-badge').textContent = '';
+  document.querySelector('main').classList.remove('searching');
+}
+
+function renderGlobalResults(q) {
+  const panel = document.getElementById('global-results');
+  panel.innerHTML = '';
+
+  const regionMatches = REGIONS_TABLE.filter(row => {
+    if (row.category) return false;
+    return [row.question, row.question_zh,
+            row.england,  row.england_zh,
+            row.scotland, row.scotland_zh,
+            row.wales,    row.wales_zh,
+            row.ni,       row.ni_zh]
+      .filter(Boolean).some(v => v.toLowerCase().includes(q));
+  });
+
+  const tlMatches = TIMELINE_DATA.filter(item =>
+    [item.fact, item.fact_zh, item.year, item.period, item.era]
+      .filter(Boolean).some(v => v.toLowerCase().includes(q))
+  );
+
+  const total = regionMatches.length + tlMatches.length;
+  document.getElementById('g-badge').textContent =
+    total ? `${total} result${total > 1 ? 's' : ''}` : '';
+
+  if (total === 0) {
+    panel.innerHTML = `<div class="gr-empty">No results for "<strong>${q}</strong>"</div>`;
+    return;
+  }
+
+  // ── Region results ──
+  if (regionMatches.length) {
+    const h = document.createElement('div');
+    h.className = 'gr-section-title';
+    h.textContent = `🏴 UK Four Regions — ${regionMatches.length} match${regionMatches.length > 1 ? 'es' : ''}`;
+    panel.appendChild(h);
+
+    regionMatches.forEach(row => {
+      const div = document.createElement('div');
+      div.className = 'gr-item';
+      div.title = 'Click to open Regions tab';
+      div.onclick = () => {
+        clearGlobalSearch();
+        switchTab('regions', document.querySelectorAll('.tab-btn')[0]);
+      };
+
+      const cols = [
+        { en: row.england,  zh: row.england_zh,  cls: 'gr-ans-eng', label: 'England 英格蘭' },
+        { en: row.scotland, zh: row.scotland_zh, cls: 'gr-ans-sco', label: 'Scotland 蘇格蘭' },
+        { en: row.wales,    zh: row.wales_zh,    cls: 'gr-ans-wal', label: 'Wales 威爾斯' },
+        { en: row.ni,       zh: row.ni_zh,       cls: 'gr-ans-ni',  label: 'N. Ireland 北愛爾蘭' },
+      ];
+      const answers = cols
+        .filter(c => c.en && c.en !== '—')
+        .map(c => `<span class="gr-ans ${c.cls}">
+          <span class="gr-ans-label">${c.label}</span>
+          <span class="en">${c.en}</span>
+          <span class="zh">${c.zh || ''}</span>
+        </span>`).join('');
+
+      const tags = (row.exams || []).map(e => `<span class="exam-tag">${e}</span>`).join('');
+      div.innerHTML = `
+        <div><span class="gr-source gr-source-regions">&#127468;&#127463; UK Regions</span></div>
+        <div class="gr-question">
+          <span class="en">${row.question}</span>
+          <span class="zh">${row.question_zh || ''}</span>
+        </div>
+        <div class="gr-answers">${answers}</div>
+        <div class="exam-tags" style="margin-top:6px">${tags}</div>`;
+      panel.appendChild(div);
+    });
+  }
+
+  // ── Timeline results ──
+  if (tlMatches.length) {
+    const h = document.createElement('div');
+    h.className = 'gr-section-title';
+    h.textContent = `🕐 Historical Timeline — ${tlMatches.length} match${tlMatches.length > 1 ? 'es' : ''}`;
+    panel.appendChild(h);
+
+    tlMatches.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'gr-item';
+      div.title = 'Click to open Timeline tab';
+      div.onclick = () => {
+        clearGlobalSearch();
+        switchTab('timeline', document.querySelectorAll('.tab-btn')[1]);
+      };
+
+      const tags = (item.exams || []).map(e => `<span class="exam-tag">Exam ${e}</span>`).join('');
+      const eraZh = ALL_ZH[item.era] || '';
+      div.innerHTML = `
+        <div><span class="gr-source gr-source-timeline">&#128336; Timeline</span></div>
+        <div class="gr-tl-meta">
+          <span class="gr-year">${item.year}</span>
+          <span class="gr-era">
+            <span class="en">${item.era}</span>
+            <span class="zh" style="display:inline;margin-top:0">${eraZh ? ' · ' + eraZh : ''}</span>
+          </span>
+        </div>
+        <div class="gr-fact">
+          <span class="en">${item.fact}</span>
+          <span class="zh">${item.fact_zh || ''}</span>
+        </div>
+        <div class="exam-tags" style="margin-top:6px">${tags}</div>`;
+      panel.appendChild(div);
+    });
+  }
+}
+
+// ── REGIONS TABLE ─────────────────────────────────────────────────
+function cell(en, zh, cls) {
+  if (!en || en === '—') return `<td class="ans ${cls} empty">—</td>`;
   return `<td class="ans ${cls}"><span class="en">${en}</span><span class="zh">${zh || ''}</span></td>`;
 }
 
 function renderRegions() {
   const tbody = document.getElementById('regions-body');
   tbody.innerHTML = '';
-
   REGIONS_TABLE.forEach(row => {
     const tr = document.createElement('tr');
-
     if (row.category) {
       tr.className = 'cat-row';
       tr.innerHTML = `<td colspan="6"><span class="en">${row.category}</span><span class="zh">${row.category_zh || ''}</span></td>`;
     } else {
       const tags = (row.exams || []).map(e => `<span class="exam-tag">${e}</span>`).join('');
-      tr.dataset.q = [
-        row.question, row.question_zh,
-        row.england,  row.england_zh,
-        row.scotland, row.scotland_zh,
-        row.wales,    row.wales_zh,
-        row.ni,       row.ni_zh
-      ].filter(Boolean).join(' ').toLowerCase();
-
+      tr.dataset.q = [row.question, row.question_zh, row.england, row.england_zh,
+                      row.scotland, row.scotland_zh, row.wales, row.wales_zh,
+                      row.ni, row.ni_zh].filter(Boolean).join(' ').toLowerCase();
       tr.innerHTML = `
         <td class="q-col"><span class="en">${row.question}</span><span class="zh">${row.question_zh || ''}</span></td>
         ${cell(row.england,  row.england_zh,  'col-eng')}
         ${cell(row.scotland, row.scotland_zh, 'col-sco')}
         ${cell(row.wales,    row.wales_zh,    'col-wal')}
         ${cell(row.ni,       row.ni_zh,       'col-ni')}
-        <td><div class="exam-tags">${tags}</div></td>
-      `;
+        <td><div class="exam-tags">${tags}</div></td>`;
     }
     tbody.appendChild(tr);
   });
@@ -460,8 +600,7 @@ function filterRegions() {
     tr.classList.toggle('hidden-row', q && !tr.dataset.q.includes(q));
   });
   document.querySelectorAll('#regions-body tr.cat-row').forEach(cat => {
-    let sib = cat.nextElementSibling;
-    let allHidden = true;
+    let sib = cat.nextElementSibling, allHidden = true;
     while (sib && !sib.classList.contains('cat-row')) {
       if (!sib.classList.contains('hidden-row')) { allHidden = false; break; }
       sib = sib.nextElementSibling;
@@ -478,7 +617,7 @@ function updateRBadge() {
     visible === total ? `${total} topics` : `${visible} of ${total} shown`;
 }
 
-// ── TIMELINE ────────────────────────────────────────────────────
+// ── TIMELINE ─────────────────────────────────────────────────────
 const ERAS = [...new Set(TIMELINE_DATA.map(d => d.era))];
 let activeEra = 'All';
 
@@ -487,8 +626,7 @@ function renderEraFilters() {
   ['All', ...ERAS].forEach(era => {
     const b = document.createElement('button');
     b.className = 'era-btn' + (era === 'All' ? ' active' : '');
-    const zhLabel = ALL_ZH[era] || '';
-    b.innerHTML = `<span class="en">${era}</span><span class="zh">${zhLabel}</span>`;
+    b.innerHTML = `<span class="en">${era}</span><span class="zh">${ALL_ZH[era] || ''}</span>`;
     b.onclick = () => {
       activeEra = era;
       document.querySelectorAll('.era-btn').forEach(x => x.classList.remove('active'));
@@ -503,7 +641,6 @@ function renderTimeline() {
   const c = document.getElementById('tl-container');
   c.innerHTML = '';
   let curEra = null;
-
   TIMELINE_DATA.forEach(item => {
     if (item.era !== curEra) {
       curEra = item.era;
@@ -513,7 +650,7 @@ function renderTimeline() {
       h.innerHTML = `<span class="en">${item.era}</span><span class="zh">${ALL_ZH[item.era] || ''}</span>`;
       c.appendChild(h);
     }
-    const tags = (item.exams || []).map(e => `<span class="exam-tag">Exam ${e}</span>`).join('');
+    const tags  = (item.exams || []).map(e => `<span class="exam-tag">Exam ${e}</span>`).join('');
     const badge = item.forRegions
       ? `<span class="region-badge" style="display:none">&#128205; <span class="en">Also in Regions tab</span><span class="zh">已於地區標籤顯示</span></span>`
       : '';
@@ -558,7 +695,7 @@ function updateTLBadge() {
     visible === total ? `${total} events` : `${visible} of ${total} shown`;
 }
 
-// ── INIT ────────────────────────────────────────────────────────
+// ── INIT ─────────────────────────────────────────────────────────
 renderRegions();
 renderEraFilters();
 renderTimeline();

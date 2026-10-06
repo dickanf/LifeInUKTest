@@ -11,7 +11,7 @@
   <meta http-equiv="Expires"       content="0" />
 
   <!-- ── BUMP VERSION to match index.html on every deploy ── -->
-  <script src="data.js?v=202610061619"></script>
+  <script src="data.js?v=202610061634"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -450,6 +450,8 @@ function applyUniqueView() {
   document.getElementById('unique-desc').innerHTML = unique
     ? 'Each topic shown in one section only — regional items hidden from Timeline<span class="zh">每個主題只在一個部分顯示 — 地區項目已從時間軸隱藏</span>'
     : 'All items visible in both sections — yellow badge marks cross-section items<span class="zh">所有項目在兩個部分均可見 — 黃色標籤標示重複項目</span>';
+  // Show region history section only when Unique View is ON
+  document.getElementById('region-history').style.display = unique ? '' : 'none';
   filterTimeline();
   updateRegionBadges();
 }

@@ -11,7 +11,7 @@
   <meta http-equiv="Expires"       content="0" />
 
   <!-- ── BUMP VERSION to match index.html on every deploy ── -->
-  <script src="data.js?v=20261006.6"></script>
+  <script src="data.js?v=20261006.7"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -510,7 +510,7 @@ function renderTimeline() {
       const h = document.createElement('div');
       h.className = 'era-label';
       h.dataset.era = item.era;
-      h.innerHTML = `<span class="en">${item.era}</span><span class="zh">${ERA_ZH[item.era] || ''}</span>`;
+      h.innerHTML = `<span class="en">${item.era}</span><span class="zh">${ALL_ZH[item.era] || ''}</span>`;
       c.appendChild(h);
     }
     const tags = (item.exams || []).map(e => `<span class="exam-tag">Exam ${e}</span>`).join('');

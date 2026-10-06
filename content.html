@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Life in the UK Test — Study Guide</title>
+  <title>Life in the UK Test — Studying</title>
 
   <!-- ── NO-CACHE ── -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -11,7 +11,7 @@
   <meta http-equiv="Expires"       content="0" />
 
   <!-- ── BUMP VERSION to match index.html on every deploy ── -->
-  <script src="data.js?v=202610061646"></script>
+  <script src="data.js?v=202610061655"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -290,6 +290,15 @@
     footer a { color: var(--uk-blue); }
     .ver { opacity:.5; }
 
+    /* ── CATEGORY TAG ── */
+    .cat-tag {
+      display: inline-block; font-size: .68rem; font-weight: 700;
+      padding: 2px 9px; border-radius: 10px; margin-bottom: 5px;
+      background: #e8f0fe; color: var(--uk-blue);
+      border: 1px solid #c5d9fc;
+    }
+    .cat-tag .zh { display: inline; font-size: .9em; margin-top: 0; color: var(--uk-blue); }
+
     /* ── HIGHLIGHT FLASH (global search navigation) ── */
     @keyframes flashBg { 0% { background:#fffbe6; box-shadow:0 0 0 3px #f0a500; } 100% { background:inherit; box-shadow:none; } }
     .highlight-flash td { animation: flashBg 2s ease-out; }
@@ -299,8 +308,8 @@
 <body data-lang="both">
 
 <header>
-  <h1>&#127468;&#127463; Life in the UK Test — Study Guide</h1>
-  <p>All questions &amp; answers from Exams 1–17 &nbsp;·&nbsp; UK Four Regions &amp; Historical Timeline &nbsp;·&nbsp; 英國入籍試備考指南</p>
+  <h1>&#127468;&#127463; Life in the UK Test — Studying</h1>
+  <p>All questions &amp; answers from Exams 1–17 &nbsp;·&nbsp; UK Four Regions &amp; Historical Timeline &nbsp;·&nbsp; 英國入籍試備考</p>
   <div class="stripe"></div>
 </header>
 
@@ -703,6 +712,9 @@ function renderTimeline() {
     const badge = item.forRegions
       ? `<span class="region-badge" style="display:none">&#128205; <span class="en">Also in Regions tab</span><span class="zh">已於地區標籤顯示</span></span>`
       : '';
+    const catTag = item.category
+      ? `<div><span class="cat-tag"><span class="en">${item.category}</span><span class="zh"> · ${item.category_zh || ''}</span></span></div>`
+      : '';
     const div = document.createElement('div');
     div.className = 'tl-item';
     div.id             = 'tl-' + idx;
@@ -713,7 +725,7 @@ function renderTimeline() {
       <div class="tl-year">${item.year}</div>
       <div class="tl-dot"></div>
       <div class="tl-box">
-        <div><span class="en">${item.fact}</span><span class="zh">${item.fact_zh || ''}</span></div>
+        ${catTag}<div><span class="en">${item.fact}</span><span class="zh">${item.fact_zh || ''}</span></div>
         <div class="exam-tags" style="margin-top:5px">${tags}${badge}</div>
       </div>`;
     c.appendChild(div);

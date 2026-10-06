@@ -11,7 +11,7 @@
   <meta http-equiv="Expires"       content="0" />
 
   <!-- ── BUMP VERSION to match index.html on every deploy ── -->
-  <script src="data.js?v=20261006.5"></script>
+  <script src="data.js?v=20261006.6"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -109,6 +109,7 @@
       border-right: 1px solid rgba(255,255,255,.15);
     }
     table.regions thead th:last-child { border-right: none; }
+    table.regions thead th .zh { color: #c8cfe0; }
 
     /* colour bands on column headers */
     table.regions thead th.col-eng { background: var(--eng); }
@@ -371,7 +372,7 @@ const _ver = new URLSearchParams(window.location.search).get('v') || '—';
 document.getElementById('ver-label').textContent = 'v' + _ver;
 
 // ── LANGUAGE TOGGLE ──────────────────────────────────────────────
-const ALL_ZH = { All: '全部', ...ERA_ZH };
+const ALL_ZH = { All: '全部', ...(typeof ERA_ZH !== 'undefined' ? ERA_ZH : {}) };
 
 function setLang(lang) {
   document.body.dataset.lang = lang;
